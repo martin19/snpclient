@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package snappyv1;
+
+//server -> client
+message Resolution {
+    uint32 width = 1;
+    uint32 height = 2;
+}
+
+enum StreamType {
+    STREAM_TYPE_VIDEO = 0;
+    STREAM_TYPE_AUDIO = 1;
+}
+
+enum Platform {
+    PLATFORM_WINDOWS = 0;
+    PLATFORM_LINUX = 1;
+    PLATFORM_MACOS = 2;
+    PLATFORM_RASPBERRY = 3;
+    PLATFORM_ANDROID = 4;
+}
+
+enum SourceType {
+    VIDEO_DESKTOP = 0;
+    VIDEO_CAMERA = 1;
+    AUDIO = 2;
+}
+
+enum EncoderType {
+    VIDEO_ENCODER_H264_SOFTWARE = 0;
+    VIDEO_ENCODER_H264_HARDWARE = 1;
+    AUDIO_ENCODER_MP3_SOFTWARE = 2;
+    AUDIO_ENCODER_MP3_HARDWARE = 3;
+}
+
+//private
+message SourceInfo {
+    SourceType type = 1;
+}
+
+//private
+message EncoderInfo {
+    EncoderType type = 1;
+    repeated Resolution resolution = 2;
+}
+
+message ServerInfo {
+    Platform platform = 1;
+    repeated Resolution available_resolutions = 2;
+    repeated SourceInfo sources = 3;
+    repeated EncoderInfo encoders = 4;
+}
+
+message StreamChange {
+    uint32 id = 1;
+    SourceInfo source = 2;
+    EncoderInfo encoder = 3;
+}
+
+message StreamStatistics {
+    uint32 last_frame = 1;
+    uint32 average_frame_qp = 2;
+    uint32 encode_ts_start_ms = 3;
+    uint32 encode_ts_end_ms = 4;
+    uint32 tx_ts_start_ms = 5;
+    uint32 tx_ts_end_ms = 6;
+}
+
+//client -> server
+message StreamStart {
+    uint32 id = 1;
+    SourceInfo source = 2;
+    EncoderInfo encoder = 3;
+}
+
+message StreamStop {
+    uint32 id = 1;
+}
+
+message Pointer {
+    uint32 absx = 1;
+    uint32 absy = 2;
+    optional int32 mask = 3;
+    optional bool down = 4;
+}
+
+message Keyboard {
+    uint32 keysym = 1;
+    uint32 keycode = 2;
+    bool down = 3;
+}
+
+message SetResolution {
+    uint32 width = 1;
+    uint32 height = 2;
+}
+
+message SetVideoStreamAttributes {
+    uint32 qp = 1;
+}
+
+message SetAudioStreamAttributes {
+    uint32 bitrate = 1;
+}
