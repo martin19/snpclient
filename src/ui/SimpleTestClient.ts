@@ -6,6 +6,7 @@ import {SnpSource} from "../core/video/SnpSource";
 import {SnpDecoderH264} from "../core/video/SnpDecoderH264";
 import {SnpSinkYuv} from "../core/video/SnpSinkYuv";
 import {fetchData} from "../core/util/BufferUtil";
+import {SnpClient} from "../core/SnpClient";
 
 SnpStreamElement.registerCustomElement();
 
@@ -34,42 +35,47 @@ function runApp() {
 document.addEventListener("DOMContentLoaded", async ()=>{
   runApp();
 
-
-  let chains:SnpDecoderChain[] = [];
-  for(let i = 0; i < 2; i++) {
-    const snpStreamElement = document.getElementsByTagName("snp-stream").item(i) as SnpStreamElement;
-    const h264DecoderChain = new SnpDecoderChain({
-      source : new SnpSource({
-        bufferSizeMs : 500,
-        maxBitrate : 10000000
-      }),
-      decoder : new SnpDecoderH264({
-        width : 1920,
-        height : 800,
-      }),
-      sink : new SnpSinkYuv({
-        width : 1920,
-        height : 800,
-        snpStreamElement : snpStreamElement
-      })
-    });
-    chains.push(h264DecoderChain);
-    h264DecoderChain.start();
-  }
+  let client = new SnpClient({
+    url : "bla",
+  });
+  client.connect();
 
 
-  // for(let i = 0; i < 3309; i++) {
-  let i = 0;
-  async function step() {
-    const data = await fetchData("testdata/simpsons/simpsons.264." + (i.toString()).padStart(4, "0"));
-    for(let j = 0; j < chains.length; j++) {
-      chains[j].source.process(data);
-    }
-    i++;
-    window.requestAnimationFrame(step);
-  }
-
-  window.requestAnimationFrame(step);
+  // let chains:SnpDecoderChain[] = [];
+  // for(let i = 0; i < 2; i++) {
+  //   const snpStreamElement = document.getElementsByTagName("snp-stream").item(i) as SnpStreamElement;
+  //   const h264DecoderChain = new SnpDecoderChain({
+  //     source : new SnpSource({
+  //       bufferSizeMs : 500,
+  //       maxBitrate : 10000000
+  //     }),
+  //     decoder : new SnpDecoderH264({
+  //       width : 1920,
+  //       height : 800,
+  //     }),
+  //     sink : new SnpSinkYuv({
+  //       width : 1920,
+  //       height : 800,
+  //       snpStreamElement : snpStreamElement
+  //     })
+  //   });
+  //   chains.push(h264DecoderChain);
+  //   h264DecoderChain.start();
+  // }
+  //
+  //
+  // // for(let i = 0; i < 3309; i++) {
+  // let i = 0;
+  // async function step() {
+  //   const data = await fetchData("testdata/simpsons/simpsons.264." + (i.toString()).padStart(4, "0"));
+  //   for(let j = 0; j < chains.length; j++) {
+  //     chains[j].source.process(data);
+  //   }
+  //   i++;
+  //   window.requestAnimationFrame(step);
+  // }
+  //
+  // window.requestAnimationFrame(step);
 
 
   // }

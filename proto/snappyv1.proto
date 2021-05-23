@@ -3,15 +3,6 @@ syntax = "proto3";
 package snappyv1;
 
 //server -> client
-message Resolution {
-    uint32 width = 1;
-    uint32 height = 2;
-}
-
-enum StreamType {
-    STREAM_TYPE_VIDEO = 0;
-    STREAM_TYPE_AUDIO = 1;
-}
 
 enum Platform {
     PLATFORM_WINDOWS = 0;
@@ -22,40 +13,99 @@ enum Platform {
 }
 
 enum SourceType {
-    VIDEO_DESKTOP = 0;
-    VIDEO_CAMERA = 1;
-    AUDIO = 2;
+    SOURCE_TYPE_VIDEO = 0;
+    SOURCE_TYPE_AUDIO = 1;
+    SOURCE_TYPE_INPUT = 2;
+}
+
+enum SourceSubType {
+    SOURCE_SUB_TYPE_X11 = 0;
+    SOURCE_SUB_TYPE_WAYLAND = 1;
+    SOURCE_SUB_TYPE_CAMERA = 2;
+    SOURCE_SUB_TYPE_KEYBOARD = 3;
+    SOURCE_SUB_TYPE_POINTER = 4;
 }
 
 enum EncoderType {
-    VIDEO_ENCODER_H264_SOFTWARE = 0;
-    VIDEO_ENCODER_H264_HARDWARE = 1;
-    AUDIO_ENCODER_MP3_SOFTWARE = 2;
-    AUDIO_ENCODER_MP3_HARDWARE = 3;
+    ENCODER_TYPE_H264_SOFTWARE = 0;
+    ENCODER_TYPE_H264_HARDWARE = 1;
+    ENCODER_TYPE_MP3_SOFTWARE = 2;
+    ENCODER_TYPE_MP3_HARDWARE = 3;
+}
+
+enum Command {
+    COMMAND_INIT = 0;
+    COMMAND_START = 1;
+    COMMAND_STOP = 2;
+    COMMAND_DESTROY = 3;
+}
+
+message Parameter {
+
+    enum ParameterType {
+        STRING = 0;
+        BOOL = 1;
+        UINT32 = 2;
+        DOUBLE = 3;
+    }
+
+    message ParameterValueString {
+        string value = 1;
+    }
+
+    message ParameterValueBool {
+        bool value = 1;
+    }
+
+    message ParameterValueUint32 {
+        uint32 value = 1;
+        optional uint32 min = 2;
+        optional uint32 max = 3;
+    }
+
+    message ParameterValueDouble {
+        double value = 1;
+        optional double min = 2;
+        optional double max = 3;
+    }
+
+    ParameterType type = 1;
+    string key = 2;
+    optional ParameterValueString value_string = 3;
+    optional ParameterValueBool value_bool = 4;
+    optional ParameterValueUint32 value_uint32 = 5;
+    optional ParameterValueDouble value_double = 6;
 }
 
 //private
-message SourceInfo {
+message Source {
     SourceType type = 1;
+    SourceSubType sub_type = 2;
+    repeated Parameter parameters = 3;
 }
 
 //private
-message EncoderInfo {
+message Encoder {
     EncoderType type = 1;
-    repeated Resolution resolution = 2;
+    repeated Parameter parameters = 2;
 }
 
 message ServerInfo {
     Platform platform = 1;
-    repeated Resolution available_resolutions = 2;
-    repeated SourceInfo sources = 3;
-    repeated EncoderInfo encoders = 4;
+    repeated Source available_sources = 3;
+    repeated Encoder available_encoders = 4;
 }
 
 message StreamChange {
-    uint32 id = 1;
-    SourceInfo source = 2;
-    EncoderInfo encoder = 3;
+
+    message StreamChange {
+        uint32 id = 1;
+        optional Source source = 2;
+        optional Encoder encoder = 3;
+        optional Command command = 4;
+    }
+
+    repeated StreamChange streams = 2;
 }
 
 message StreamStatistics {
@@ -67,39 +117,37 @@ message StreamStatistics {
     uint32 tx_ts_end_ms = 6;
 }
 
+message StreamData {
+    uint32 stream_id = 1;
+    bytes payload = 2;
+}
+
+enum MessageType {
+    MESSAGE_TYPE_SERVER_INFO = 0;
+    MESSAGE_TYPE_STREAMS_CHANGE = 1;
+    MESSAGE_TYPE_STREAM_DATA = 2;
+}
+
+message Message {
+    MessageType type = 1;
+    oneof message {
+        ServerInfo server_info = 2;
+        StreamChange stream_change = 3;
+        StreamData stream_data = 4;
+    }
+}
+
+
 //client -> server
-message StreamStart {
-    uint32 id = 1;
-    SourceInfo source = 2;
-    EncoderInfo encoder = 3;
-}
-
-message StreamStop {
-    uint32 id = 1;
-}
-
-message Pointer {
-    uint32 absx = 1;
-    uint32 absy = 2;
-    optional int32 mask = 3;
-    optional bool down = 4;
-}
-
-message Keyboard {
-    uint32 keysym = 1;
-    uint32 keycode = 2;
-    bool down = 3;
-}
-
-message SetResolution {
-    uint32 width = 1;
-    uint32 height = 2;
-}
-
-message SetVideoStreamAttributes {
-    uint32 qp = 1;
-}
-
-message SetAudioStreamAttributes {
-    uint32 bitrate = 1;
-}
+//message Pointer {
+//    uint32 absx = 1;
+//    uint32 absy = 2;
+//    optional int32 mask = 3;
+//    optional bool down = 4;
+//}
+//
+//message Keyboard {
+//    uint32 keysym = 1;
+//    uint32 keycode = 2;
+//    bool down = 3;
+//}
