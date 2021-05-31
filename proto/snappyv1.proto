@@ -40,41 +40,43 @@ enum Command {
     COMMAND_DESTROY = 3;
 }
 
+enum ParameterType {
+    PARAMETER_TYPE_STRING = 0;
+    PARAMETER_TYPE_BOOL = 1;
+    PARAMETER_TYPE_UINT32 = 2;
+    PARAMETER_TYPE_DOUBLE = 3;
+}
+
 message Parameter {
 
-    enum ParameterType {
-        STRING = 0;
-        BOOL = 1;
-        UINT32 = 2;
-        DOUBLE = 3;
-    }
-
-    message ParameterValueString {
+    message ValueString {
         string value = 1;
     }
 
-    message ParameterValueBool {
+    message ValueBool {
         bool value = 1;
     }
 
-    message ParameterValueUint32 {
+    message ValueUint32 {
         uint32 value = 1;
         optional uint32 min = 2;
         optional uint32 max = 3;
     }
 
-    message ParameterValueDouble {
+    message ValueDouble {
         double value = 1;
         optional double min = 2;
         optional double max = 3;
     }
 
-    ParameterType type = 1;
-    string key = 2;
-    optional ParameterValueString value_string = 3;
-    optional ParameterValueBool value_bool = 4;
-    optional ParameterValueUint32 value_uint32 = 5;
-    optional ParameterValueDouble value_double = 6;
+    ParameterType param_type = 1;
+    string param_key = 2;
+    oneof param_value {
+        ValueString value_string = 3;
+        ValueBool value_bool = 4;
+        ValueUint32 value_uint32 = 5;
+        ValueDouble value_double = 6;
+    }
 }
 
 //private
@@ -96,7 +98,7 @@ message ServerInfo {
     repeated Encoder available_encoders = 4;
 }
 
-message StreamChange {
+message StreamsChange {
 
     message StreamChange {
         uint32 id = 1;
@@ -132,22 +134,19 @@ message Message {
     MessageType type = 1;
     oneof message {
         ServerInfo server_info = 2;
-        StreamChange stream_change = 3;
+        StreamsChange stream_change = 3;
         StreamData stream_data = 4;
     }
 }
 
+message StreamDataPointer {
+    uint32 absx = 1;
+    uint32 absy = 2;
+    optional int32 mask = 3;
+}
 
-//client -> server
-//message Pointer {
-//    uint32 absx = 1;
-//    uint32 absy = 2;
-//    optional int32 mask = 3;
-//    optional bool down = 4;
-//}
-//
-//message Keyboard {
-//    uint32 keysym = 1;
-//    uint32 keycode = 2;
-//    bool down = 3;
-//}
+message StreamDataKeyboard {
+    uint32 keysym = 1;
+    uint32 keycode = 2;
+    bool down = 3;
+}

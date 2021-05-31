@@ -1,4 +1,4 @@
-import {computeBufferSize} from "../util/BufferUtil";
+import {computeBufferSize} from "../../util/BufferUtil";
 
 interface SnpSourceConstructor {
   new (options:SnpSourceOptions): SnpSource;

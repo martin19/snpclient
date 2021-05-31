@@ -1,14 +1,15 @@
 import SnpDecoderWorkerH264 from 'worker-loader!./worker/SnpDecoderWorkerH264';
 import {WebGLFrameSink} from "./yuvcanvas/WebGLFrameSink";
-import {SnpDecoder, SnpDecoderOptions} from "./SnpDecoder";
+import {SnpComponent, SnpComponentOptions} from "../SnpComponent";
+import {SnpPort} from "../SnpPort";
 
 
-export interface SnpDecoderH264Options extends SnpDecoderOptions {
+export interface SnpDecoderH264Options extends SnpComponentOptions {
   width : number;
   height : number;
 }
 
-export class SnpDecoderH264 extends SnpDecoder {
+export class SnpDecoderH264 extends SnpComponent {
 
   inputSab : SharedArrayBuffer;
   inputSabArray : Uint8Array;
@@ -22,6 +23,11 @@ export class SnpDecoderH264 extends SnpDecoder {
 
   constructor(options:SnpDecoderH264Options) {
     super(options);
+
+    this.addInputPort(new SnpPort({}));
+    this.addOutputPort(new SnpPort({}));
+    this.getInputPort(0).onDataCb = this.onInputData.bind(this);
+
     this.snpDecoderWorkerH264 = new SnpDecoderWorkerH264(),
     this.inputSab = new SharedArrayBuffer(1000000);
     this.inputSabArray = new Uint8Array(this.inputSab);
@@ -36,11 +42,11 @@ export class SnpDecoderH264 extends SnpDecoder {
       } else if(type === "onDecodeError") {
         console.log(`decode error`);
       }
-      this.decodePromiseResolve(new Uint8Array(params.output));
+      this.getOutputPort(0).onData(new Uint8Array(params.output), true);
     });
   }
 
-  async process(data:Uint8Array) {
+  onInputData(data:Uint8Array, complete?:boolean) {
     this.inputSabArray.set(data);
     this.snpDecoderWorkerH264.postMessage({
       type: "decode",
@@ -50,12 +56,5 @@ export class SnpDecoderH264 extends SnpDecoder {
         output: this.outputSab
       }
     });
-
-    this.decodePromise = new Promise<Uint8Array>((resolve, reject) => {
-      this.decodePromiseResolve = resolve;
-      this.decodePromiseReject = reject;
-    });
-
-    return this.decodePromise;
   }
 }

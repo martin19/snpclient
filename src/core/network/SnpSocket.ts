@@ -1,15 +1,14 @@
-import {Message, MessageType, ServerInfo, StreamChange, StreamData, StreamStatistics} from "./proto/snappyv1";
-import {SnpDecoderChain} from "../video/SnpDecoderChain";
-import {SnpSource} from "../video/SnpSource";
-import {SnpDecoderH264} from "../video/SnpDecoderH264";
-import {SnpSinkYuv} from "../video/SnpSinkYuv";
+import {Message, MessageType, ServerInfo, StreamData, StreamsChange, StreamStatistics} from "./proto/snappyv1";
+import {SnpSource} from "../stream/video/SnpSource";
+import {SnpDecoderH264} from "../stream/video/SnpDecoderH264";
+import {SnpSinkYuv} from "../stream/video/SnpSinkYuv";
 import SnpStreamElement from "../../ui/SnpStreamElement";
 
 
 export interface SnpClientOptions {
   url : string
   onServerInfo : (msg:ServerInfo) => void;
-  onStreamsChange : (msg:StreamChange) => void;
+  onStreamsChange : (msg:StreamsChange) => void;
   onStreamData : (msg:StreamData) => void;
 }
 
@@ -17,7 +16,7 @@ export class SnpSocket {
   url : string;
   socket : WebSocket;
   onServerInfo : (msg:ServerInfo) => void;
-  onStreamChange : (msg:StreamChange) => void;
+  onStreamChange : (msg:StreamsChange) => void;
   onStreamData : (msg:StreamData) => void;
 
   constructor(options:SnpClientOptions) {
@@ -62,11 +61,15 @@ export class SnpSocket {
     console.log(JSON.stringify(streamStatistics, null, " "));
   }
 
-  sendStreamsChange(streamsChange:StreamChange) {
+  sendStreamsChange(streamsChange:StreamsChange) {
     let msg:Message = {
       type : MessageType.MESSAGE_TYPE_STREAMS_CHANGE,
       streamChange : streamsChange
     } as Message;
+    this.socket.send(Message.encode(msg).finish());
+  }
+
+  send(msg:Message) {
     this.socket.send(Message.encode(msg).finish());
   }
 }

@@ -230,6 +230,50 @@ export function commandToJSON(object: Command): string {
   }
 }
 
+export enum ParameterType {
+  PARAMETER_TYPE_STRING = 0,
+  PARAMETER_TYPE_BOOL = 1,
+  PARAMETER_TYPE_UINT32 = 2,
+  PARAMETER_TYPE_DOUBLE = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function parameterTypeFromJSON(object: any): ParameterType {
+  switch (object) {
+    case 0:
+    case "PARAMETER_TYPE_STRING":
+      return ParameterType.PARAMETER_TYPE_STRING;
+    case 1:
+    case "PARAMETER_TYPE_BOOL":
+      return ParameterType.PARAMETER_TYPE_BOOL;
+    case 2:
+    case "PARAMETER_TYPE_UINT32":
+      return ParameterType.PARAMETER_TYPE_UINT32;
+    case 3:
+    case "PARAMETER_TYPE_DOUBLE":
+      return ParameterType.PARAMETER_TYPE_DOUBLE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ParameterType.UNRECOGNIZED;
+  }
+}
+
+export function parameterTypeToJSON(object: ParameterType): string {
+  switch (object) {
+    case ParameterType.PARAMETER_TYPE_STRING:
+      return "PARAMETER_TYPE_STRING";
+    case ParameterType.PARAMETER_TYPE_BOOL:
+      return "PARAMETER_TYPE_BOOL";
+    case ParameterType.PARAMETER_TYPE_UINT32:
+      return "PARAMETER_TYPE_UINT32";
+    case ParameterType.PARAMETER_TYPE_DOUBLE:
+      return "PARAMETER_TYPE_DOUBLE";
+    default:
+      return "UNKNOWN";
+  }
+}
+
 export enum MessageType {
   MESSAGE_TYPE_SERVER_INFO = 0,
   MESSAGE_TYPE_STREAMS_CHANGE = 1,
@@ -269,77 +313,29 @@ export function messageTypeToJSON(object: MessageType): string {
 }
 
 export interface Parameter {
-  type: Parameter_ParameterType;
-  key: string;
-  valueString?: Parameter_ParameterValueString | undefined;
-  valueBool?: Parameter_ParameterValueBool | undefined;
-  valueUint32?: Parameter_ParameterValueUint32 | undefined;
-  valueDouble?: Parameter_ParameterValueDouble | undefined;
+  paramType: ParameterType;
+  paramKey: string;
+  valueString: Parameter_ValueString | undefined;
+  valueBool: Parameter_ValueBool | undefined;
+  valueUint32: Parameter_ValueUint32 | undefined;
+  valueDouble: Parameter_ValueDouble | undefined;
 }
 
-export enum Parameter_ParameterType {
-  STRING = 0,
-  BOOL = 1,
-  UINT32 = 2,
-  DOUBLE = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function parameter_ParameterTypeFromJSON(
-  object: any
-): Parameter_ParameterType {
-  switch (object) {
-    case 0:
-    case "STRING":
-      return Parameter_ParameterType.STRING;
-    case 1:
-    case "BOOL":
-      return Parameter_ParameterType.BOOL;
-    case 2:
-    case "UINT32":
-      return Parameter_ParameterType.UINT32;
-    case 3:
-    case "DOUBLE":
-      return Parameter_ParameterType.DOUBLE;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return Parameter_ParameterType.UNRECOGNIZED;
-  }
-}
-
-export function parameter_ParameterTypeToJSON(
-  object: Parameter_ParameterType
-): string {
-  switch (object) {
-    case Parameter_ParameterType.STRING:
-      return "STRING";
-    case Parameter_ParameterType.BOOL:
-      return "BOOL";
-    case Parameter_ParameterType.UINT32:
-      return "UINT32";
-    case Parameter_ParameterType.DOUBLE:
-      return "DOUBLE";
-    default:
-      return "UNKNOWN";
-  }
-}
-
-export interface Parameter_ParameterValueString {
+export interface Parameter_ValueString {
   value: string;
 }
 
-export interface Parameter_ParameterValueBool {
+export interface Parameter_ValueBool {
   value: boolean;
 }
 
-export interface Parameter_ParameterValueUint32 {
+export interface Parameter_ValueUint32 {
   value: number;
   min?: number | undefined;
   max?: number | undefined;
 }
 
-export interface Parameter_ParameterValueDouble {
+export interface Parameter_ValueDouble {
   value: number;
   min?: number | undefined;
   max?: number | undefined;
@@ -364,11 +360,11 @@ export interface ServerInfo {
   availableEncoders: Encoder[];
 }
 
-export interface StreamChange {
-  streams: StreamChange_StreamChange[];
+export interface StreamsChange {
+  streams: StreamsChange_StreamChange[];
 }
 
-export interface StreamChange_StreamChange {
+export interface StreamsChange_StreamChange {
   id: number;
   source?: Source | undefined;
   encoder?: Encoder | undefined;
@@ -392,40 +388,52 @@ export interface StreamData {
 export interface Message {
   type: MessageType;
   serverInfo: ServerInfo | undefined;
-  streamChange: StreamChange | undefined;
+  streamChange: StreamsChange | undefined;
   streamData: StreamData | undefined;
 }
 
-const baseParameter: object = { type: 0, key: "" };
+export interface StreamDataPointer {
+  absx: number;
+  absy: number;
+  mask?: number | undefined;
+}
+
+export interface StreamDataKeyboard {
+  keysym: number;
+  keycode: number;
+  down: boolean;
+}
+
+const baseParameter: object = { paramType: 0, paramKey: "" };
 
 export const Parameter = {
   encode(message: Parameter, writer: Writer = Writer.create()): Writer {
-    if (message.type !== 0) {
-      writer.uint32(8).int32(message.type);
+    if (message.paramType !== 0) {
+      writer.uint32(8).int32(message.paramType);
     }
-    if (message.key !== "") {
-      writer.uint32(18).string(message.key);
+    if (message.paramKey !== "") {
+      writer.uint32(18).string(message.paramKey);
     }
     if (message.valueString !== undefined) {
-      Parameter_ParameterValueString.encode(
+      Parameter_ValueString.encode(
         message.valueString,
         writer.uint32(26).fork()
       ).ldelim();
     }
     if (message.valueBool !== undefined) {
-      Parameter_ParameterValueBool.encode(
+      Parameter_ValueBool.encode(
         message.valueBool,
         writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.valueUint32 !== undefined) {
-      Parameter_ParameterValueUint32.encode(
+      Parameter_ValueUint32.encode(
         message.valueUint32,
         writer.uint32(42).fork()
       ).ldelim();
     }
     if (message.valueDouble !== undefined) {
-      Parameter_ParameterValueDouble.encode(
+      Parameter_ValueDouble.encode(
         message.valueDouble,
         writer.uint32(50).fork()
       ).ldelim();
@@ -441,31 +449,31 @@ export const Parameter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.type = reader.int32() as any;
+          message.paramType = reader.int32() as any;
           break;
         case 2:
-          message.key = reader.string();
+          message.paramKey = reader.string();
           break;
         case 3:
-          message.valueString = Parameter_ParameterValueString.decode(
+          message.valueString = Parameter_ValueString.decode(
             reader,
             reader.uint32()
           );
           break;
         case 4:
-          message.valueBool = Parameter_ParameterValueBool.decode(
+          message.valueBool = Parameter_ValueBool.decode(
             reader,
             reader.uint32()
           );
           break;
         case 5:
-          message.valueUint32 = Parameter_ParameterValueUint32.decode(
+          message.valueUint32 = Parameter_ValueUint32.decode(
             reader,
             reader.uint32()
           );
           break;
         case 6:
-          message.valueDouble = Parameter_ParameterValueDouble.decode(
+          message.valueDouble = Parameter_ValueDouble.decode(
             reader,
             reader.uint32()
           );
@@ -480,41 +488,33 @@ export const Parameter = {
 
   fromJSON(object: any): Parameter {
     const message = { ...baseParameter } as Parameter;
-    if (object.type !== undefined && object.type !== null) {
-      message.type = parameter_ParameterTypeFromJSON(object.type);
+    if (object.paramType !== undefined && object.paramType !== null) {
+      message.paramType = parameterTypeFromJSON(object.paramType);
     } else {
-      message.type = 0;
+      message.paramType = 0;
     }
-    if (object.key !== undefined && object.key !== null) {
-      message.key = String(object.key);
+    if (object.paramKey !== undefined && object.paramKey !== null) {
+      message.paramKey = String(object.paramKey);
     } else {
-      message.key = "";
+      message.paramKey = "";
     }
     if (object.valueString !== undefined && object.valueString !== null) {
-      message.valueString = Parameter_ParameterValueString.fromJSON(
-        object.valueString
-      );
+      message.valueString = Parameter_ValueString.fromJSON(object.valueString);
     } else {
       message.valueString = undefined;
     }
     if (object.valueBool !== undefined && object.valueBool !== null) {
-      message.valueBool = Parameter_ParameterValueBool.fromJSON(
-        object.valueBool
-      );
+      message.valueBool = Parameter_ValueBool.fromJSON(object.valueBool);
     } else {
       message.valueBool = undefined;
     }
     if (object.valueUint32 !== undefined && object.valueUint32 !== null) {
-      message.valueUint32 = Parameter_ParameterValueUint32.fromJSON(
-        object.valueUint32
-      );
+      message.valueUint32 = Parameter_ValueUint32.fromJSON(object.valueUint32);
     } else {
       message.valueUint32 = undefined;
     }
     if (object.valueDouble !== undefined && object.valueDouble !== null) {
-      message.valueDouble = Parameter_ParameterValueDouble.fromJSON(
-        object.valueDouble
-      );
+      message.valueDouble = Parameter_ValueDouble.fromJSON(object.valueDouble);
     } else {
       message.valueDouble = undefined;
     }
@@ -523,63 +523,61 @@ export const Parameter = {
 
   toJSON(message: Parameter): unknown {
     const obj: any = {};
-    message.type !== undefined &&
-      (obj.type = parameter_ParameterTypeToJSON(message.type));
-    message.key !== undefined && (obj.key = message.key);
+    message.paramType !== undefined &&
+      (obj.paramType = parameterTypeToJSON(message.paramType));
+    message.paramKey !== undefined && (obj.paramKey = message.paramKey);
     message.valueString !== undefined &&
       (obj.valueString = message.valueString
-        ? Parameter_ParameterValueString.toJSON(message.valueString)
+        ? Parameter_ValueString.toJSON(message.valueString)
         : undefined);
     message.valueBool !== undefined &&
       (obj.valueBool = message.valueBool
-        ? Parameter_ParameterValueBool.toJSON(message.valueBool)
+        ? Parameter_ValueBool.toJSON(message.valueBool)
         : undefined);
     message.valueUint32 !== undefined &&
       (obj.valueUint32 = message.valueUint32
-        ? Parameter_ParameterValueUint32.toJSON(message.valueUint32)
+        ? Parameter_ValueUint32.toJSON(message.valueUint32)
         : undefined);
     message.valueDouble !== undefined &&
       (obj.valueDouble = message.valueDouble
-        ? Parameter_ParameterValueDouble.toJSON(message.valueDouble)
+        ? Parameter_ValueDouble.toJSON(message.valueDouble)
         : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Parameter>): Parameter {
     const message = { ...baseParameter } as Parameter;
-    if (object.type !== undefined && object.type !== null) {
-      message.type = object.type;
+    if (object.paramType !== undefined && object.paramType !== null) {
+      message.paramType = object.paramType;
     } else {
-      message.type = 0;
+      message.paramType = 0;
     }
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key;
+    if (object.paramKey !== undefined && object.paramKey !== null) {
+      message.paramKey = object.paramKey;
     } else {
-      message.key = "";
+      message.paramKey = "";
     }
     if (object.valueString !== undefined && object.valueString !== null) {
-      message.valueString = Parameter_ParameterValueString.fromPartial(
+      message.valueString = Parameter_ValueString.fromPartial(
         object.valueString
       );
     } else {
       message.valueString = undefined;
     }
     if (object.valueBool !== undefined && object.valueBool !== null) {
-      message.valueBool = Parameter_ParameterValueBool.fromPartial(
-        object.valueBool
-      );
+      message.valueBool = Parameter_ValueBool.fromPartial(object.valueBool);
     } else {
       message.valueBool = undefined;
     }
     if (object.valueUint32 !== undefined && object.valueUint32 !== null) {
-      message.valueUint32 = Parameter_ParameterValueUint32.fromPartial(
+      message.valueUint32 = Parameter_ValueUint32.fromPartial(
         object.valueUint32
       );
     } else {
       message.valueUint32 = undefined;
     }
     if (object.valueDouble !== undefined && object.valueDouble !== null) {
-      message.valueDouble = Parameter_ParameterValueDouble.fromPartial(
+      message.valueDouble = Parameter_ValueDouble.fromPartial(
         object.valueDouble
       );
     } else {
@@ -589,11 +587,11 @@ export const Parameter = {
   },
 };
 
-const baseParameter_ParameterValueString: object = { value: "" };
+const baseParameter_ValueString: object = { value: "" };
 
-export const Parameter_ParameterValueString = {
+export const Parameter_ValueString = {
   encode(
-    message: Parameter_ParameterValueString,
+    message: Parameter_ValueString,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== "") {
@@ -602,15 +600,10 @@ export const Parameter_ParameterValueString = {
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): Parameter_ParameterValueString {
+  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueString {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseParameter_ParameterValueString,
-    } as Parameter_ParameterValueString;
+    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -625,10 +618,8 @@ export const Parameter_ParameterValueString = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ParameterValueString {
-    const message = {
-      ...baseParameter_ParameterValueString,
-    } as Parameter_ParameterValueString;
+  fromJSON(object: any): Parameter_ValueString {
+    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = String(object.value);
     } else {
@@ -637,18 +628,16 @@ export const Parameter_ParameterValueString = {
     return message;
   },
 
-  toJSON(message: Parameter_ParameterValueString): unknown {
+  toJSON(message: Parameter_ValueString): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<Parameter_ParameterValueString>
-  ): Parameter_ParameterValueString {
-    const message = {
-      ...baseParameter_ParameterValueString,
-    } as Parameter_ParameterValueString;
+    object: DeepPartial<Parameter_ValueString>
+  ): Parameter_ValueString {
+    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     } else {
@@ -658,11 +647,11 @@ export const Parameter_ParameterValueString = {
   },
 };
 
-const baseParameter_ParameterValueBool: object = { value: false };
+const baseParameter_ValueBool: object = { value: false };
 
-export const Parameter_ParameterValueBool = {
+export const Parameter_ValueBool = {
   encode(
-    message: Parameter_ParameterValueBool,
+    message: Parameter_ValueBool,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value === true) {
@@ -671,15 +660,10 @@ export const Parameter_ParameterValueBool = {
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): Parameter_ParameterValueBool {
+  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueBool {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseParameter_ParameterValueBool,
-    } as Parameter_ParameterValueBool;
+    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -694,10 +678,8 @@ export const Parameter_ParameterValueBool = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ParameterValueBool {
-    const message = {
-      ...baseParameter_ParameterValueBool,
-    } as Parameter_ParameterValueBool;
+  fromJSON(object: any): Parameter_ValueBool {
+    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = Boolean(object.value);
     } else {
@@ -706,18 +688,14 @@ export const Parameter_ParameterValueBool = {
     return message;
   },
 
-  toJSON(message: Parameter_ParameterValueBool): unknown {
+  toJSON(message: Parameter_ValueBool): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<Parameter_ParameterValueBool>
-  ): Parameter_ParameterValueBool {
-    const message = {
-      ...baseParameter_ParameterValueBool,
-    } as Parameter_ParameterValueBool;
+  fromPartial(object: DeepPartial<Parameter_ValueBool>): Parameter_ValueBool {
+    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     } else {
@@ -727,11 +705,11 @@ export const Parameter_ParameterValueBool = {
   },
 };
 
-const baseParameter_ParameterValueUint32: object = { value: 0 };
+const baseParameter_ValueUint32: object = { value: 0 };
 
-export const Parameter_ParameterValueUint32 = {
+export const Parameter_ValueUint32 = {
   encode(
-    message: Parameter_ParameterValueUint32,
+    message: Parameter_ValueUint32,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== 0) {
@@ -746,15 +724,10 @@ export const Parameter_ParameterValueUint32 = {
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): Parameter_ParameterValueUint32 {
+  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueUint32 {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseParameter_ParameterValueUint32,
-    } as Parameter_ParameterValueUint32;
+    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -775,10 +748,8 @@ export const Parameter_ParameterValueUint32 = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ParameterValueUint32 {
-    const message = {
-      ...baseParameter_ParameterValueUint32,
-    } as Parameter_ParameterValueUint32;
+  fromJSON(object: any): Parameter_ValueUint32 {
+    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
     } else {
@@ -797,7 +768,7 @@ export const Parameter_ParameterValueUint32 = {
     return message;
   },
 
-  toJSON(message: Parameter_ParameterValueUint32): unknown {
+  toJSON(message: Parameter_ValueUint32): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     message.min !== undefined && (obj.min = message.min);
@@ -806,11 +777,9 @@ export const Parameter_ParameterValueUint32 = {
   },
 
   fromPartial(
-    object: DeepPartial<Parameter_ParameterValueUint32>
-  ): Parameter_ParameterValueUint32 {
-    const message = {
-      ...baseParameter_ParameterValueUint32,
-    } as Parameter_ParameterValueUint32;
+    object: DeepPartial<Parameter_ValueUint32>
+  ): Parameter_ValueUint32 {
+    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     } else {
@@ -830,11 +799,11 @@ export const Parameter_ParameterValueUint32 = {
   },
 };
 
-const baseParameter_ParameterValueDouble: object = { value: 0 };
+const baseParameter_ValueDouble: object = { value: 0 };
 
-export const Parameter_ParameterValueDouble = {
+export const Parameter_ValueDouble = {
   encode(
-    message: Parameter_ParameterValueDouble,
+    message: Parameter_ValueDouble,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== 0) {
@@ -849,15 +818,10 @@ export const Parameter_ParameterValueDouble = {
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): Parameter_ParameterValueDouble {
+  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueDouble {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseParameter_ParameterValueDouble,
-    } as Parameter_ParameterValueDouble;
+    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -878,10 +842,8 @@ export const Parameter_ParameterValueDouble = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ParameterValueDouble {
-    const message = {
-      ...baseParameter_ParameterValueDouble,
-    } as Parameter_ParameterValueDouble;
+  fromJSON(object: any): Parameter_ValueDouble {
+    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
     } else {
@@ -900,7 +862,7 @@ export const Parameter_ParameterValueDouble = {
     return message;
   },
 
-  toJSON(message: Parameter_ParameterValueDouble): unknown {
+  toJSON(message: Parameter_ValueDouble): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     message.min !== undefined && (obj.min = message.min);
@@ -909,11 +871,9 @@ export const Parameter_ParameterValueDouble = {
   },
 
   fromPartial(
-    object: DeepPartial<Parameter_ParameterValueDouble>
-  ): Parameter_ParameterValueDouble {
-    const message = {
-      ...baseParameter_ParameterValueDouble,
-    } as Parameter_ParameterValueDouble;
+    object: DeepPartial<Parameter_ValueDouble>
+  ): Parameter_ValueDouble {
+    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     } else {
@@ -1235,27 +1195,27 @@ export const ServerInfo = {
   },
 };
 
-const baseStreamChange: object = {};
+const baseStreamsChange: object = {};
 
-export const StreamChange = {
-  encode(message: StreamChange, writer: Writer = Writer.create()): Writer {
+export const StreamsChange = {
+  encode(message: StreamsChange, writer: Writer = Writer.create()): Writer {
     for (const v of message.streams) {
-      StreamChange_StreamChange.encode(v!, writer.uint32(18).fork()).ldelim();
+      StreamsChange_StreamChange.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): StreamChange {
+  decode(input: Reader | Uint8Array, length?: number): StreamsChange {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseStreamChange } as StreamChange;
+    const message = { ...baseStreamsChange } as StreamsChange;
     message.streams = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
           message.streams.push(
-            StreamChange_StreamChange.decode(reader, reader.uint32())
+            StreamsChange_StreamChange.decode(reader, reader.uint32())
           );
           break;
         default:
@@ -1266,22 +1226,22 @@ export const StreamChange = {
     return message;
   },
 
-  fromJSON(object: any): StreamChange {
-    const message = { ...baseStreamChange } as StreamChange;
+  fromJSON(object: any): StreamsChange {
+    const message = { ...baseStreamsChange } as StreamsChange;
     message.streams = [];
     if (object.streams !== undefined && object.streams !== null) {
       for (const e of object.streams) {
-        message.streams.push(StreamChange_StreamChange.fromJSON(e));
+        message.streams.push(StreamsChange_StreamChange.fromJSON(e));
       }
     }
     return message;
   },
 
-  toJSON(message: StreamChange): unknown {
+  toJSON(message: StreamsChange): unknown {
     const obj: any = {};
     if (message.streams) {
       obj.streams = message.streams.map((e) =>
-        e ? StreamChange_StreamChange.toJSON(e) : undefined
+        e ? StreamsChange_StreamChange.toJSON(e) : undefined
       );
     } else {
       obj.streams = [];
@@ -1289,23 +1249,23 @@ export const StreamChange = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StreamChange>): StreamChange {
-    const message = { ...baseStreamChange } as StreamChange;
+  fromPartial(object: DeepPartial<StreamsChange>): StreamsChange {
+    const message = { ...baseStreamsChange } as StreamsChange;
     message.streams = [];
     if (object.streams !== undefined && object.streams !== null) {
       for (const e of object.streams) {
-        message.streams.push(StreamChange_StreamChange.fromPartial(e));
+        message.streams.push(StreamsChange_StreamChange.fromPartial(e));
       }
     }
     return message;
   },
 };
 
-const baseStreamChange_StreamChange: object = { id: 0 };
+const baseStreamsChange_StreamChange: object = { id: 0 };
 
-export const StreamChange_StreamChange = {
+export const StreamsChange_StreamChange = {
   encode(
-    message: StreamChange_StreamChange,
+    message: StreamsChange_StreamChange,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.id !== 0) {
@@ -1326,12 +1286,12 @@ export const StreamChange_StreamChange = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): StreamChange_StreamChange {
+  ): StreamsChange_StreamChange {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseStreamChange_StreamChange,
-    } as StreamChange_StreamChange;
+      ...baseStreamsChange_StreamChange,
+    } as StreamsChange_StreamChange;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1355,10 +1315,10 @@ export const StreamChange_StreamChange = {
     return message;
   },
 
-  fromJSON(object: any): StreamChange_StreamChange {
+  fromJSON(object: any): StreamsChange_StreamChange {
     const message = {
-      ...baseStreamChange_StreamChange,
-    } as StreamChange_StreamChange;
+      ...baseStreamsChange_StreamChange,
+    } as StreamsChange_StreamChange;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
     } else {
@@ -1382,7 +1342,7 @@ export const StreamChange_StreamChange = {
     return message;
   },
 
-  toJSON(message: StreamChange_StreamChange): unknown {
+  toJSON(message: StreamsChange_StreamChange): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.source !== undefined &&
@@ -1400,11 +1360,11 @@ export const StreamChange_StreamChange = {
   },
 
   fromPartial(
-    object: DeepPartial<StreamChange_StreamChange>
-  ): StreamChange_StreamChange {
+    object: DeepPartial<StreamsChange_StreamChange>
+  ): StreamsChange_StreamChange {
     const message = {
-      ...baseStreamChange_StreamChange,
-    } as StreamChange_StreamChange;
+      ...baseStreamsChange_StreamChange,
+    } as StreamsChange_StreamChange;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
@@ -1672,7 +1632,7 @@ export const Message = {
       ServerInfo.encode(message.serverInfo, writer.uint32(18).fork()).ldelim();
     }
     if (message.streamChange !== undefined) {
-      StreamChange.encode(
+      StreamsChange.encode(
         message.streamChange,
         writer.uint32(26).fork()
       ).ldelim();
@@ -1697,7 +1657,7 @@ export const Message = {
           message.serverInfo = ServerInfo.decode(reader, reader.uint32());
           break;
         case 3:
-          message.streamChange = StreamChange.decode(reader, reader.uint32());
+          message.streamChange = StreamsChange.decode(reader, reader.uint32());
           break;
         case 4:
           message.streamData = StreamData.decode(reader, reader.uint32());
@@ -1723,7 +1683,7 @@ export const Message = {
       message.serverInfo = undefined;
     }
     if (object.streamChange !== undefined && object.streamChange !== null) {
-      message.streamChange = StreamChange.fromJSON(object.streamChange);
+      message.streamChange = StreamsChange.fromJSON(object.streamChange);
     } else {
       message.streamChange = undefined;
     }
@@ -1744,7 +1704,7 @@ export const Message = {
         : undefined);
     message.streamChange !== undefined &&
       (obj.streamChange = message.streamChange
-        ? StreamChange.toJSON(message.streamChange)
+        ? StreamsChange.toJSON(message.streamChange)
         : undefined);
     message.streamData !== undefined &&
       (obj.streamData = message.streamData
@@ -1766,7 +1726,7 @@ export const Message = {
       message.serverInfo = undefined;
     }
     if (object.streamChange !== undefined && object.streamChange !== null) {
-      message.streamChange = StreamChange.fromPartial(object.streamChange);
+      message.streamChange = StreamsChange.fromPartial(object.streamChange);
     } else {
       message.streamChange = undefined;
     }
@@ -1774,6 +1734,187 @@ export const Message = {
       message.streamData = StreamData.fromPartial(object.streamData);
     } else {
       message.streamData = undefined;
+    }
+    return message;
+  },
+};
+
+const baseStreamDataPointer: object = { absx: 0, absy: 0 };
+
+export const StreamDataPointer = {
+  encode(message: StreamDataPointer, writer: Writer = Writer.create()): Writer {
+    if (message.absx !== 0) {
+      writer.uint32(8).uint32(message.absx);
+    }
+    if (message.absy !== 0) {
+      writer.uint32(16).uint32(message.absy);
+    }
+    if (message.mask !== undefined) {
+      writer.uint32(24).int32(message.mask);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): StreamDataPointer {
+    const reader = input instanceof Reader ? input : new Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseStreamDataPointer } as StreamDataPointer;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.absx = reader.uint32();
+          break;
+        case 2:
+          message.absy = reader.uint32();
+          break;
+        case 3:
+          message.mask = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StreamDataPointer {
+    const message = { ...baseStreamDataPointer } as StreamDataPointer;
+    if (object.absx !== undefined && object.absx !== null) {
+      message.absx = Number(object.absx);
+    } else {
+      message.absx = 0;
+    }
+    if (object.absy !== undefined && object.absy !== null) {
+      message.absy = Number(object.absy);
+    } else {
+      message.absy = 0;
+    }
+    if (object.mask !== undefined && object.mask !== null) {
+      message.mask = Number(object.mask);
+    } else {
+      message.mask = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: StreamDataPointer): unknown {
+    const obj: any = {};
+    message.absx !== undefined && (obj.absx = message.absx);
+    message.absy !== undefined && (obj.absy = message.absy);
+    message.mask !== undefined && (obj.mask = message.mask);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<StreamDataPointer>): StreamDataPointer {
+    const message = { ...baseStreamDataPointer } as StreamDataPointer;
+    if (object.absx !== undefined && object.absx !== null) {
+      message.absx = object.absx;
+    } else {
+      message.absx = 0;
+    }
+    if (object.absy !== undefined && object.absy !== null) {
+      message.absy = object.absy;
+    } else {
+      message.absy = 0;
+    }
+    if (object.mask !== undefined && object.mask !== null) {
+      message.mask = object.mask;
+    } else {
+      message.mask = undefined;
+    }
+    return message;
+  },
+};
+
+const baseStreamDataKeyboard: object = { keysym: 0, keycode: 0, down: false };
+
+export const StreamDataKeyboard = {
+  encode(
+    message: StreamDataKeyboard,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.keysym !== 0) {
+      writer.uint32(8).uint32(message.keysym);
+    }
+    if (message.keycode !== 0) {
+      writer.uint32(16).uint32(message.keycode);
+    }
+    if (message.down === true) {
+      writer.uint32(24).bool(message.down);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): StreamDataKeyboard {
+    const reader = input instanceof Reader ? input : new Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseStreamDataKeyboard } as StreamDataKeyboard;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.keysym = reader.uint32();
+          break;
+        case 2:
+          message.keycode = reader.uint32();
+          break;
+        case 3:
+          message.down = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StreamDataKeyboard {
+    const message = { ...baseStreamDataKeyboard } as StreamDataKeyboard;
+    if (object.keysym !== undefined && object.keysym !== null) {
+      message.keysym = Number(object.keysym);
+    } else {
+      message.keysym = 0;
+    }
+    if (object.keycode !== undefined && object.keycode !== null) {
+      message.keycode = Number(object.keycode);
+    } else {
+      message.keycode = 0;
+    }
+    if (object.down !== undefined && object.down !== null) {
+      message.down = Boolean(object.down);
+    } else {
+      message.down = false;
+    }
+    return message;
+  },
+
+  toJSON(message: StreamDataKeyboard): unknown {
+    const obj: any = {};
+    message.keysym !== undefined && (obj.keysym = message.keysym);
+    message.keycode !== undefined && (obj.keycode = message.keycode);
+    message.down !== undefined && (obj.down = message.down);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<StreamDataKeyboard>): StreamDataKeyboard {
+    const message = { ...baseStreamDataKeyboard } as StreamDataKeyboard;
+    if (object.keysym !== undefined && object.keysym !== null) {
+      message.keysym = object.keysym;
+    } else {
+      message.keysym = 0;
+    }
+    if (object.keycode !== undefined && object.keycode !== null) {
+      message.keycode = object.keycode;
+    } else {
+      message.keycode = 0;
+    }
+    if (object.down !== undefined && object.down !== null) {
+      message.down = object.down;
+    } else {
+      message.down = false;
     }
     return message;
   },

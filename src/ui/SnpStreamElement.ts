@@ -4,9 +4,15 @@ export default class SnpStreamElement extends HTMLElement {
 
   shadow : ShadowRoot;
   canvasElement : HTMLCanvasElement;
+  overlayElement : HTMLCanvasElement;
   snpStreamCanvas : SnpStreamCanvas;
   toggleFullsceenEvent : CustomEvent;
   resizeObserver : ResizeObserver;
+
+  streamWidth : number;
+  streamHeight : number;
+  localWidth : number;
+  localHeight : number;
 
   constructor() {
     super();
@@ -19,7 +25,7 @@ export default class SnpStreamElement extends HTMLElement {
                     width:100%;
                     height:100%;
                 }           
-                #input, #overlay, #content {
+                #overlay, #content {
                     position:absolute;
                     top:0;
                     left:0;
@@ -27,7 +33,7 @@ export default class SnpStreamElement extends HTMLElement {
                     height:100%;
                 } 
                 
-                #canvas {
+                #canvas, #canvas-overlay, #input {
                     width : 100%;
                     height : 100%;
                 }              
@@ -57,6 +63,8 @@ export default class SnpStreamElement extends HTMLElement {
 <!--                        Sorry, your browser doesn't support embedded videos.-->
 <!--                    </video>-->
                     <canvas id="canvas"></canvas>
+                    <canvas id="canvas-overlay"></canvas>    
+                    <div id="input"></div>                
                 </div>
                 <div id="overlay">
                     <div id="coordinates"></div>
@@ -104,6 +112,14 @@ export default class SnpStreamElement extends HTMLElement {
     }
   }
 
+  addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
+    this.shadow.getElementById("input").addEventListener(type, listener, options);
+  }
+
+  removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions) {
+    this.shadow.getElementById("input").removeEventListener(type, listener, options);
+  }
+
   connectedCallback() {
     this.shadow.getElementById("wrapper").addEventListener("mousemove", (e:MouseEvent)=>{
       this.shadow.getElementById("coordinates").innerText = e.clientX + "/" + e.clientY;
@@ -115,7 +131,16 @@ export default class SnpStreamElement extends HTMLElement {
     });
   }
 
+  transformLocalToStream(x: number, y: number) {
+    return { x : (x / this.localWidth)*this.streamWidth, y : (y / this.localHeight)*this.streamHeight };
+  }
+
+  transformStreamToLocal(x: number, y: number) {
+    return { x : (x / this.streamWidth)*this.localWidth, y : (y / this.streamHeight)*this.localHeight };
+  }
+
   static registerCustomElement() {
     customElements.define('snp-stream', SnpStreamElement);
   }
+
 }

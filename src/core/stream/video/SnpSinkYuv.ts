@@ -1,15 +1,16 @@
-import {SnpSink, SnpSinkOptions} from "./SnpSink";
 import {WebGLFrameSink} from "./yuvcanvas/WebGLFrameSink";
-import SnpStreamElement from "../../ui/SnpStreamElement";
+import SnpStreamElement from "../../../ui/SnpStreamElement";
 import {YUVBuffer, YUVFrame} from "./yuvcanvas/YuvBuffer";
+import {SnpComponent, SnpComponentOptions} from "../SnpComponent";
+import {SnpPort} from "../SnpPort";
 
-export interface SnpSinkYuvOptions extends SnpSinkOptions {
+export interface SnpSinkYuvOptions extends SnpComponentOptions {
   width:number;
   height:number;
   snpStreamElement : SnpStreamElement;
 }
 
-export class SnpSinkYuv extends SnpSink {
+export class SnpSinkYuv extends SnpComponent {
 
   width: number;
   height: number;
@@ -19,6 +20,10 @@ export class SnpSinkYuv extends SnpSink {
 
   constructor(options: SnpSinkYuvOptions) {
     super(options);
+
+    this.addInputPort(new SnpPort({}));
+    this.getInputPort(0).onDataCb = this.onInputData.bind(this);
+
     this.snpStreamElement = options.snpStreamElement;
     this.canvas = options.snpStreamElement.canvas;
     this.frameSink = new WebGLFrameSink(this.canvas);
@@ -26,7 +31,7 @@ export class SnpSinkYuv extends SnpSink {
     this.height = options.height;
   }
 
-  async process(data: Uint8Array): Promise<void> {
+  onInputData(data: Uint8Array, complete? : boolean) {
     const width = this.width;
     const height = this.height;
     const frame: YUVFrame = {
