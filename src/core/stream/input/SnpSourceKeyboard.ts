@@ -2,6 +2,7 @@ import {SnpComponent, SnpComponentOptions} from "../SnpComponent";
 import {SnpPort} from "../SnpPort";
 import SnpStreamElement from "../../../ui/SnpStreamElement";
 import {StreamDataKeyboard, StreamDataPointer} from "../../network/proto/snappyv1";
+import xtscancodes from "./xtscancodes";
 
 export interface SnpSourceOptions extends SnpComponentOptions {
   snpStreamElement : SnpStreamElement
@@ -27,8 +28,8 @@ export class SnpSourceKeyboard extends SnpComponent {
 
   onKeyDown(e:KeyboardEvent) {
     const streamDataKeyboard:StreamDataKeyboard = {
-      keycode : e.charCode, //TODO: mapping
-      keysym : e.charCode, //TODO: mapping
+      keycode : xtscancodes[e.code],
+      keysym : 0, //TODO: omit/remove
       down : true
     }
     this.getOutputPort(0).onData(StreamDataKeyboard.encode(streamDataKeyboard).finish(), true);
@@ -36,8 +37,8 @@ export class SnpSourceKeyboard extends SnpComponent {
 
   onKeyUp(e:KeyboardEvent) {
     const streamDataKeyboard:StreamDataKeyboard = {
-      keycode : e.charCode, //TODO: mapping
-      keysym : e.charCode, //TODO: mapping
+      keycode : xtscancodes[e.code],
+      keysym : 0, //TODO: omit/remove
       down : false
     }
     this.getOutputPort(0).onData(StreamDataKeyboard.encode(streamDataKeyboard).finish(), true);
