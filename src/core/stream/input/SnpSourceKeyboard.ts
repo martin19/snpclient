@@ -1,7 +1,7 @@
 import {SnpComponent, SnpComponentOptions} from "../SnpComponent";
 import {SnpPort} from "../SnpPort";
 import SnpStreamElement from "../../../ui/SnpStreamElement";
-import {StreamDataKeyboard, StreamDataPointer} from "../../network/proto/snappyv1";
+import {StreamDataKeyboard} from "../../network/proto/snappyv1";
 import xtscancodes from "./xtscancodes";
 
 export interface SnpSourceOptions extends SnpComponentOptions {

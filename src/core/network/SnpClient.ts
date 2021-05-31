@@ -19,6 +19,7 @@ import {SnpPipe} from "../stream/SnpPipe";
 import {SnpSourceMouse} from "../stream/input/SnpSourceMouse";
 import {SnpSinkNetwork} from "../stream/network/SnpSinkNetwork";
 import {SnpSourceKeyboard} from "../stream/input/SnpSourceKeyboard";
+import {SnpSinkCursor} from "../stream/input/SnpSinkCursor";
 
 export interface SnpClientOptions {
   url : string;
@@ -43,8 +44,9 @@ export class SnpClient {
 
   socket : SnpSocket;
   fixedVideoPipe : SnpPipe;
-  fixedInputMousePipe : SnpPipe;
-  fixedInputKeyboardPipe : SnpPipe;
+  fixedMousePipe : SnpPipe;
+  fixedKeyboardPipe : SnpPipe;
+  fixedCursorPipe : SnpPipe;
 
   streamListeners : Map<number, OnDataCallback>;
 
@@ -61,6 +63,9 @@ export class SnpClient {
     //create a fixed video pipe
     {
       const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
+      //TODO: move this somewhere else.
+      snpStreamElement.streamWidth = 1920;
+      snpStreamElement.streamHeight = 1088;
       const source = new SnpSourceNetwork({
         streamId : 0,
         client : this
@@ -93,6 +98,9 @@ export class SnpClient {
         client : this,
       });
       SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
+      this.fixedMousePipe = new SnpPipe({});
+      this.fixedMousePipe.addComponent(source);
+      this.fixedMousePipe.addComponent(sink);
     }
     //create a fixed input keyboard pipe
     {
@@ -105,12 +113,31 @@ export class SnpClient {
         client : this,
       });
       SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
+      this.fixedKeyboardPipe = new SnpPipe({});
+      this.fixedKeyboardPipe.addComponent(source);
+      this.fixedKeyboardPipe.addComponent(sink);
+    }
+    //create a fixed cursor pipe
+    {
+      const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
+      const source = new SnpSourceNetwork({
+        client : this,
+        streamId : 3
+      });
+      const sink = new SnpSinkCursor({
+        snpStreamElement : snpStreamElement
+      });
+      SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
+      this.fixedCursorPipe = new SnpPipe({});
+      this.fixedCursorPipe.addComponent(source);
+      this.fixedCursorPipe.addComponent(sink);
     }
 
-    //TODO: start all pipes
-    this.fixedInputMousePipe.start();
-    this.fixedInputKeyboardPipe.start();
+    //start all pipes
+    this.fixedMousePipe.start();
+    this.fixedKeyboardPipe.start();
     this.fixedVideoPipe.start();
+    this.fixedCursorPipe.start();
   }
 
   connect() {

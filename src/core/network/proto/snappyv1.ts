@@ -98,6 +98,7 @@ export enum SourceSubType {
   SOURCE_SUB_TYPE_CAMERA = 2,
   SOURCE_SUB_TYPE_KEYBOARD = 3,
   SOURCE_SUB_TYPE_POINTER = 4,
+  SOURCE_SUB_TYPE_CURSOR = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -118,6 +119,9 @@ export function sourceSubTypeFromJSON(object: any): SourceSubType {
     case 4:
     case "SOURCE_SUB_TYPE_POINTER":
       return SourceSubType.SOURCE_SUB_TYPE_POINTER;
+    case 5:
+    case "SOURCE_SUB_TYPE_CURSOR":
+      return SourceSubType.SOURCE_SUB_TYPE_CURSOR;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -137,6 +141,8 @@ export function sourceSubTypeToJSON(object: SourceSubType): string {
       return "SOURCE_SUB_TYPE_KEYBOARD";
     case SourceSubType.SOURCE_SUB_TYPE_POINTER:
       return "SOURCE_SUB_TYPE_POINTER";
+    case SourceSubType.SOURCE_SUB_TYPE_CURSOR:
+      return "SOURCE_SUB_TYPE_CURSOR";
     default:
       return "UNKNOWN";
   }
@@ -404,6 +410,14 @@ export interface StreamDataKeyboard {
   keysym: number;
   keycode: number;
   down: boolean;
+}
+
+export interface StreamDataCursor {
+  width: number;
+  height: number;
+  hotx: number;
+  hoty: number;
+  image: Uint8Array;
 }
 
 const baseParameter: object = { type: 0, key: "" };
@@ -1844,6 +1858,114 @@ export const StreamDataKeyboard = {
     }
     if (object.down !== undefined && object.down !== null) {
       message.down = object.down;
+    }
+    return message;
+  },
+};
+
+const baseStreamDataCursor: object = { width: 0, height: 0, hotx: 0, hoty: 0 };
+
+export const StreamDataCursor = {
+  encode(message: StreamDataCursor, writer: Writer = Writer.create()): Writer {
+    if (message.width !== 0) {
+      writer.uint32(8).uint32(message.width);
+    }
+    if (message.height !== 0) {
+      writer.uint32(16).uint32(message.height);
+    }
+    if (message.hotx !== 0) {
+      writer.uint32(24).uint32(message.hotx);
+    }
+    if (message.hoty !== 0) {
+      writer.uint32(32).uint32(message.hoty);
+    }
+    if (message.image.length !== 0) {
+      writer.uint32(42).bytes(message.image);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): StreamDataCursor {
+    const reader = input instanceof Reader ? input : new Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseStreamDataCursor } as StreamDataCursor;
+    message.image = new Uint8Array();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.width = reader.uint32();
+          break;
+        case 2:
+          message.height = reader.uint32();
+          break;
+        case 3:
+          message.hotx = reader.uint32();
+          break;
+        case 4:
+          message.hoty = reader.uint32();
+          break;
+        case 5:
+          message.image = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StreamDataCursor {
+    const message = { ...baseStreamDataCursor } as StreamDataCursor;
+    message.image = new Uint8Array();
+    if (object.width !== undefined && object.width !== null) {
+      message.width = Number(object.width);
+    }
+    if (object.height !== undefined && object.height !== null) {
+      message.height = Number(object.height);
+    }
+    if (object.hotx !== undefined && object.hotx !== null) {
+      message.hotx = Number(object.hotx);
+    }
+    if (object.hoty !== undefined && object.hoty !== null) {
+      message.hoty = Number(object.hoty);
+    }
+    if (object.image !== undefined && object.image !== null) {
+      message.image = bytesFromBase64(object.image);
+    }
+    return message;
+  },
+
+  toJSON(message: StreamDataCursor): unknown {
+    const obj: any = {};
+    message.width !== undefined && (obj.width = message.width);
+    message.height !== undefined && (obj.height = message.height);
+    message.hotx !== undefined && (obj.hotx = message.hotx);
+    message.hoty !== undefined && (obj.hoty = message.hoty);
+    message.image !== undefined &&
+      (obj.image = base64FromBytes(
+        message.image !== undefined ? message.image : new Uint8Array()
+      ));
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<StreamDataCursor>): StreamDataCursor {
+    const message = { ...baseStreamDataCursor } as StreamDataCursor;
+    if (object.width !== undefined && object.width !== null) {
+      message.width = object.width;
+    }
+    if (object.height !== undefined && object.height !== null) {
+      message.height = object.height;
+    }
+    if (object.hotx !== undefined && object.hotx !== null) {
+      message.hotx = object.hotx;
+    }
+    if (object.hoty !== undefined && object.hoty !== null) {
+      message.hoty = object.hoty;
+    }
+    if (object.image !== undefined && object.image !== null) {
+      message.image = object.image;
     }
     return message;
   },

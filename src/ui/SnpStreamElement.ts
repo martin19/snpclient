@@ -3,8 +3,8 @@ import {SnpStreamCanvas} from "./SnpStreamCanvas";
 export default class SnpStreamElement extends HTMLElement {
 
   shadow : ShadowRoot;
+  inputElement : HTMLDivElement;
   canvasElement : HTMLCanvasElement;
-  overlayElement : HTMLCanvasElement;
   snpStreamCanvas : SnpStreamCanvas;
   toggleFullsceenEvent : CustomEvent;
   resizeObserver : ResizeObserver;
@@ -13,6 +13,8 @@ export default class SnpStreamElement extends HTMLElement {
   streamHeight : number;
   localWidth : number;
   localHeight : number;
+
+  cursorCanvas : HTMLCanvasElement;
 
   constructor() {
     super();
@@ -33,7 +35,7 @@ export default class SnpStreamElement extends HTMLElement {
                     height:100%;
                 } 
                 
-                #canvas, #canvas-overlay, #input {
+                #canvas, #input {
                     width : 100%;
                     height : 100%;
                 }              
@@ -57,13 +59,7 @@ export default class SnpStreamElement extends HTMLElement {
             </style>
             <div id="wrapper">                                
                 <div id="content">
-<!--                    <img style="width:100%;height:100%" src="test.gif"/>                    -->
-<!--                    <video style="width:100%;height:100%;object-fit:contain" muted autoplay loop="loop">-->
-<!--                        <source src="bunny.mp4" type="video/mp4">                    -->
-<!--                        Sorry, your browser doesn't support embedded videos.-->
-<!--                    </video>-->
-                    <canvas id="canvas"></canvas>
-                    <canvas id="canvas-overlay"></canvas>    
+                    <canvas id="canvas"></canvas>                        
                     <div id="input"></div>                
                 </div>
                 <div id="overlay">
@@ -75,18 +71,27 @@ export default class SnpStreamElement extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "closed" });
     this.shadow.appendChild(template.content.cloneNode(true));
 
+    //stream image plane
     this.canvasElement = this.shadow.getElementById("canvas") as HTMLCanvasElement;
+
+    //input element
+    this.inputElement = this.shadow.getElementById("input") as HTMLDivElement;
+
+    //cursor
+    this.cursorCanvas = document.createElement("canvas");
+    this.cursorCanvas.width = 0;
+    this.cursorCanvas.height = 0;
 
     this.resizeObserver = new ResizeObserver(entries => {
       for(let entry of entries) {
         if(entry.contentBoxSize) {
+          this.localWidth = entry.contentRect.width;
+          this.localHeight = entry.contentRect.height;
           this.snpStreamCanvas.resize(entry.contentRect.width, entry.contentRect.height);
         }
       }
     });
     this.resizeObserver.observe(this.canvasElement);
-
-    // this.snpStreamCanvas = new SnpStreamCanvas(this.canvas);
 
     //events
     this.toggleFullsceenEvent = new CustomEvent("togglefullscreen", {
@@ -113,11 +118,11 @@ export default class SnpStreamElement extends HTMLElement {
   }
 
   addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
-    this.shadow.getElementById("input").addEventListener(type, listener, options);
+    this.inputElement.addEventListener(type, listener, options);
   }
 
   removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions) {
-    this.shadow.getElementById("input").removeEventListener(type, listener, options);
+    this.inputElement.removeEventListener(type, listener, options);
   }
 
   connectedCallback() {
@@ -129,6 +134,9 @@ export default class SnpStreamElement extends HTMLElement {
       this.fullscreen = !this.fullscreen;
       this.shadow.dispatchEvent(this.toggleFullsceenEvent);
     });
+
+    this.localWidth = this.canvasElement.clientWidth;
+    this.localHeight = this.canvasElement.clientHeight;
   }
 
   transformLocalToStream(x: number, y: number) {
@@ -139,8 +147,21 @@ export default class SnpStreamElement extends HTMLElement {
     return { x : (x / this.streamWidth)*this.localWidth, y : (y / this.streamHeight)*this.localHeight };
   }
 
+  setCursor(rgba: Uint8Array, width: number, height: number, hotx: number, hoty: number) {
+    const canvas = this.cursorCanvas;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    let img = new ImageData(new Uint8ClampedArray(rgba), width, height);
+    ctx.clearRect(0, 0, width, height);
+    ctx.putImageData(img, 0, 0);
+    let url = canvas.toDataURL();
+    this.inputElement.style.cursor = 'url(' + url + ')' + hotx + ' ' + hoty + ', default';
+  }
+
   static registerCustomElement() {
     customElements.define('snp-stream', SnpStreamElement);
   }
+
 
 }
