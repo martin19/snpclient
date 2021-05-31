@@ -55,7 +55,9 @@ export class SnpSinkYuv extends SnpSink {
         stride: width / 2,
       }
     }
-    this.frameSink.drawFrame(frame);
+    window.requestAnimationFrame(()=>{
+      this.frameSink.drawFrame(frame);
+    });
   }
 }
 

@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   runApp();
 
   let client = new SnpClient({
-    url : "bla",
+    url : "ws://pi:9002",
   });
   client.connect();
 

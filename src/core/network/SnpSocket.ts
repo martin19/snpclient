@@ -1,4 +1,9 @@
-import {Message, MessageType, ServerInfo, StreamData, StreamChange, StreamStatistics} from "./proto/snappyv1";
+import {Message, MessageType, ServerInfo, StreamChange, StreamData, StreamStatistics} from "./proto/snappyv1";
+import {SnpDecoderChain} from "../video/SnpDecoderChain";
+import {SnpSource} from "../video/SnpSource";
+import {SnpDecoderH264} from "../video/SnpDecoderH264";
+import {SnpSinkYuv} from "../video/SnpSinkYuv";
+import SnpStreamElement from "../../ui/SnpStreamElement";
 
 
 export interface SnpClientOptions {
@@ -45,6 +50,9 @@ export class SnpSocket {
         case MessageType.MESSAGE_TYPE_STREAM_DATA: {
           this.onStreamData(message.streamData);
         } break;
+        default: {
+          console.log("received invalid message");
+        }
       }
     }
   }
@@ -55,6 +63,10 @@ export class SnpSocket {
   }
 
   sendStreamsChange(streamsChange:StreamChange) {
-    console.log(StreamChange.encode(streamsChange).ldelim().finish());
+    let msg:Message = {
+      type : MessageType.MESSAGE_TYPE_STREAMS_CHANGE,
+      streamChange : streamsChange
+    } as Message;
+    this.socket.send(Message.encode(msg).finish());
   }
 }

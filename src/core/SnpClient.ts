@@ -10,6 +10,10 @@ import {
   StreamData,
   StreamChange
 } from "./network/proto/snappyv1";
+import SnpStreamElement from "../ui/SnpStreamElement";
+import {SnpSource} from "./video/SnpSource";
+import {SnpDecoderH264} from "./video/SnpDecoderH264";
+import {SnpSinkYuv} from "./video/SnpSinkYuv";
 
 export interface SnpClientOptions {
   url : string;
@@ -34,6 +38,7 @@ export class SnpClient {
 
   socket : SnpSocket;
   decoderChains : Map<string, SnpDecoderChain>;
+  fixedchain : SnpDecoderChain;
 
   constructor(options : SnpClientOptions) {
     this.socket = new SnpSocket({
@@ -43,15 +48,33 @@ export class SnpClient {
       onStreamData : this.onStreamData.bind(this)
     });
     this.decoderChains = new Map();
+
+    //create a fixed chain
+    const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
+    this.fixedchain = new SnpDecoderChain({
+      source : new SnpSource({
+        bufferSizeMs : 500,
+        maxBitrate : 10000000
+      }),
+      decoder : new SnpDecoderH264({
+        width : 1920,
+        height : 1088,
+      }),
+      sink : new SnpSinkYuv({
+        width : 1920,
+        height : 1088,
+        snpStreamElement : snpStreamElement
+      })
+    });
+    this.fixedchain.start();
   }
 
   connect() {
-    this.onServerInfo()
-    // this.socket.connect();
+    this.socket.connect();
   }
 
   disconnect() {
-
+    this.socket.disconnect();
   }
 
   private onServerInfo(/*msg:ServerInfo*/) {
@@ -102,13 +125,6 @@ export class SnpClient {
       ]
     };
     this.socket.sendStreamsChange(streamsChange);
-
-
-    const streamData:StreamData = {
-      streamId : 1,
-      payload : new Uint8Array(1000)
-    }
-    console.log(StreamData.encode(streamData).finish());
   }
 
   private onStreamsChange(msg:StreamChange) {
@@ -120,5 +136,6 @@ export class SnpClient {
 
   private onStreamData(msg:StreamData) {
     //TODO: feed stream data in the appropriate Chain
+    this.fixedchain.source.process(msg.payload);
   }
 }
