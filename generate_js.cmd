@@ -1,1 +1,1 @@
-C:\\Users\\marti\\Documents\\projects\\hstream\\server\\snpserver\\tools\\protobuf-3.17.0\\cmake\\cmake-build-release\\protoc.exe --plugin=protoc-gen-ts_proto=.\node_modules\.bin\protoc-gen-ts_proto.cmd --ts_proto_out=./src/core/network ./proto/snappyv1.proto
+C:\\Users\\marti\\Documents\\projects\\hstream\\server\\snpserver\\tools\\protobuf-3.17.0\\cmake\\cmake-build-release\\protoc.exe --plugin=protoc-gen-ts_proto=.\node_modules\.bin\protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/core/network ./proto/snappyv1.proto

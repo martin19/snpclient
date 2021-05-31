@@ -313,12 +313,13 @@ export function messageTypeToJSON(object: MessageType): string {
 }
 
 export interface Parameter {
-  paramType: ParameterType;
-  paramKey: string;
-  valueString: Parameter_ValueString | undefined;
-  valueBool: Parameter_ValueBool | undefined;
-  valueUint32: Parameter_ValueUint32 | undefined;
-  valueDouble: Parameter_ValueDouble | undefined;
+  type: ParameterType;
+  key: string;
+  value?:
+    | { $case: "valueString"; valueString: Parameter_ValueString }
+    | { $case: "valueBool"; valueBool: Parameter_ValueBool }
+    | { $case: "valueUint32"; valueUint32: Parameter_ValueUint32 }
+    | { $case: "valueDouble"; valueDouble: Parameter_ValueDouble };
 }
 
 export interface Parameter_ValueString {
@@ -387,9 +388,10 @@ export interface StreamData {
 
 export interface Message {
   type: MessageType;
-  serverInfo: ServerInfo | undefined;
-  streamChange: StreamsChange | undefined;
-  streamData: StreamData | undefined;
+  message?:
+    | { $case: "serverInfo"; serverInfo: ServerInfo }
+    | { $case: "streamChange"; streamChange: StreamsChange }
+    | { $case: "streamData"; streamData: StreamData };
 }
 
 export interface StreamDataPointer {
@@ -404,37 +406,37 @@ export interface StreamDataKeyboard {
   down: boolean;
 }
 
-const baseParameter: object = { paramType: 0, paramKey: "" };
+const baseParameter: object = { type: 0, key: "" };
 
 export const Parameter = {
   encode(message: Parameter, writer: Writer = Writer.create()): Writer {
-    if (message.paramType !== 0) {
-      writer.uint32(8).int32(message.paramType);
+    if (message.type !== 0) {
+      writer.uint32(8).int32(message.type);
     }
-    if (message.paramKey !== "") {
-      writer.uint32(18).string(message.paramKey);
+    if (message.key !== "") {
+      writer.uint32(18).string(message.key);
     }
-    if (message.valueString !== undefined) {
+    if (message.value?.$case === "valueString") {
       Parameter_ValueString.encode(
-        message.valueString,
+        message.value.valueString,
         writer.uint32(26).fork()
       ).ldelim();
     }
-    if (message.valueBool !== undefined) {
+    if (message.value?.$case === "valueBool") {
       Parameter_ValueBool.encode(
-        message.valueBool,
+        message.value.valueBool,
         writer.uint32(34).fork()
       ).ldelim();
     }
-    if (message.valueUint32 !== undefined) {
+    if (message.value?.$case === "valueUint32") {
       Parameter_ValueUint32.encode(
-        message.valueUint32,
+        message.value.valueUint32,
         writer.uint32(42).fork()
       ).ldelim();
     }
-    if (message.valueDouble !== undefined) {
+    if (message.value?.$case === "valueDouble") {
       Parameter_ValueDouble.encode(
-        message.valueDouble,
+        message.value.valueDouble,
         writer.uint32(50).fork()
       ).ldelim();
     }
@@ -449,34 +451,34 @@ export const Parameter = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.paramType = reader.int32() as any;
+          message.type = reader.int32() as any;
           break;
         case 2:
-          message.paramKey = reader.string();
+          message.key = reader.string();
           break;
         case 3:
-          message.valueString = Parameter_ValueString.decode(
-            reader,
-            reader.uint32()
-          );
+          message.value = {
+            $case: "valueString",
+            valueString: Parameter_ValueString.decode(reader, reader.uint32()),
+          };
           break;
         case 4:
-          message.valueBool = Parameter_ValueBool.decode(
-            reader,
-            reader.uint32()
-          );
+          message.value = {
+            $case: "valueBool",
+            valueBool: Parameter_ValueBool.decode(reader, reader.uint32()),
+          };
           break;
         case 5:
-          message.valueUint32 = Parameter_ValueUint32.decode(
-            reader,
-            reader.uint32()
-          );
+          message.value = {
+            $case: "valueUint32",
+            valueUint32: Parameter_ValueUint32.decode(reader, reader.uint32()),
+          };
           break;
         case 6:
-          message.valueDouble = Parameter_ValueDouble.decode(
-            reader,
-            reader.uint32()
-          );
+          message.value = {
+            $case: "valueDouble",
+            valueDouble: Parameter_ValueDouble.decode(reader, reader.uint32()),
+          };
           break;
         default:
           reader.skipType(tag & 7);
@@ -488,100 +490,116 @@ export const Parameter = {
 
   fromJSON(object: any): Parameter {
     const message = { ...baseParameter } as Parameter;
-    if (object.paramType !== undefined && object.paramType !== null) {
-      message.paramType = parameterTypeFromJSON(object.paramType);
-    } else {
-      message.paramType = 0;
+    if (object.type !== undefined && object.type !== null) {
+      message.type = parameterTypeFromJSON(object.type);
     }
-    if (object.paramKey !== undefined && object.paramKey !== null) {
-      message.paramKey = String(object.paramKey);
-    } else {
-      message.paramKey = "";
+    if (object.key !== undefined && object.key !== null) {
+      message.key = String(object.key);
     }
     if (object.valueString !== undefined && object.valueString !== null) {
-      message.valueString = Parameter_ValueString.fromJSON(object.valueString);
-    } else {
-      message.valueString = undefined;
+      message.value = {
+        $case: "valueString",
+        valueString: Parameter_ValueString.fromJSON(object.valueString),
+      };
     }
     if (object.valueBool !== undefined && object.valueBool !== null) {
-      message.valueBool = Parameter_ValueBool.fromJSON(object.valueBool);
-    } else {
-      message.valueBool = undefined;
+      message.value = {
+        $case: "valueBool",
+        valueBool: Parameter_ValueBool.fromJSON(object.valueBool),
+      };
     }
     if (object.valueUint32 !== undefined && object.valueUint32 !== null) {
-      message.valueUint32 = Parameter_ValueUint32.fromJSON(object.valueUint32);
-    } else {
-      message.valueUint32 = undefined;
+      message.value = {
+        $case: "valueUint32",
+        valueUint32: Parameter_ValueUint32.fromJSON(object.valueUint32),
+      };
     }
     if (object.valueDouble !== undefined && object.valueDouble !== null) {
-      message.valueDouble = Parameter_ValueDouble.fromJSON(object.valueDouble);
-    } else {
-      message.valueDouble = undefined;
+      message.value = {
+        $case: "valueDouble",
+        valueDouble: Parameter_ValueDouble.fromJSON(object.valueDouble),
+      };
     }
     return message;
   },
 
   toJSON(message: Parameter): unknown {
     const obj: any = {};
-    message.paramType !== undefined &&
-      (obj.paramType = parameterTypeToJSON(message.paramType));
-    message.paramKey !== undefined && (obj.paramKey = message.paramKey);
-    message.valueString !== undefined &&
-      (obj.valueString = message.valueString
-        ? Parameter_ValueString.toJSON(message.valueString)
+    message.type !== undefined &&
+      (obj.type = parameterTypeToJSON(message.type));
+    message.key !== undefined && (obj.key = message.key);
+    message.value?.$case === "valueString" &&
+      (obj.valueString = message.value?.valueString
+        ? Parameter_ValueString.toJSON(message.value?.valueString)
         : undefined);
-    message.valueBool !== undefined &&
-      (obj.valueBool = message.valueBool
-        ? Parameter_ValueBool.toJSON(message.valueBool)
+    message.value?.$case === "valueBool" &&
+      (obj.valueBool = message.value?.valueBool
+        ? Parameter_ValueBool.toJSON(message.value?.valueBool)
         : undefined);
-    message.valueUint32 !== undefined &&
-      (obj.valueUint32 = message.valueUint32
-        ? Parameter_ValueUint32.toJSON(message.valueUint32)
+    message.value?.$case === "valueUint32" &&
+      (obj.valueUint32 = message.value?.valueUint32
+        ? Parameter_ValueUint32.toJSON(message.value?.valueUint32)
         : undefined);
-    message.valueDouble !== undefined &&
-      (obj.valueDouble = message.valueDouble
-        ? Parameter_ValueDouble.toJSON(message.valueDouble)
+    message.value?.$case === "valueDouble" &&
+      (obj.valueDouble = message.value?.valueDouble
+        ? Parameter_ValueDouble.toJSON(message.value?.valueDouble)
         : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Parameter>): Parameter {
     const message = { ...baseParameter } as Parameter;
-    if (object.paramType !== undefined && object.paramType !== null) {
-      message.paramType = object.paramType;
-    } else {
-      message.paramType = 0;
+    if (object.type !== undefined && object.type !== null) {
+      message.type = object.type;
     }
-    if (object.paramKey !== undefined && object.paramKey !== null) {
-      message.paramKey = object.paramKey;
-    } else {
-      message.paramKey = "";
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
     }
-    if (object.valueString !== undefined && object.valueString !== null) {
-      message.valueString = Parameter_ValueString.fromPartial(
-        object.valueString
-      );
-    } else {
-      message.valueString = undefined;
+    if (
+      object.value?.$case === "valueString" &&
+      object.value?.valueString !== undefined &&
+      object.value?.valueString !== null
+    ) {
+      message.value = {
+        $case: "valueString",
+        valueString: Parameter_ValueString.fromPartial(
+          object.value.valueString
+        ),
+      };
     }
-    if (object.valueBool !== undefined && object.valueBool !== null) {
-      message.valueBool = Parameter_ValueBool.fromPartial(object.valueBool);
-    } else {
-      message.valueBool = undefined;
+    if (
+      object.value?.$case === "valueBool" &&
+      object.value?.valueBool !== undefined &&
+      object.value?.valueBool !== null
+    ) {
+      message.value = {
+        $case: "valueBool",
+        valueBool: Parameter_ValueBool.fromPartial(object.value.valueBool),
+      };
     }
-    if (object.valueUint32 !== undefined && object.valueUint32 !== null) {
-      message.valueUint32 = Parameter_ValueUint32.fromPartial(
-        object.valueUint32
-      );
-    } else {
-      message.valueUint32 = undefined;
+    if (
+      object.value?.$case === "valueUint32" &&
+      object.value?.valueUint32 !== undefined &&
+      object.value?.valueUint32 !== null
+    ) {
+      message.value = {
+        $case: "valueUint32",
+        valueUint32: Parameter_ValueUint32.fromPartial(
+          object.value.valueUint32
+        ),
+      };
     }
-    if (object.valueDouble !== undefined && object.valueDouble !== null) {
-      message.valueDouble = Parameter_ValueDouble.fromPartial(
-        object.valueDouble
-      );
-    } else {
-      message.valueDouble = undefined;
+    if (
+      object.value?.$case === "valueDouble" &&
+      object.value?.valueDouble !== undefined &&
+      object.value?.valueDouble !== null
+    ) {
+      message.value = {
+        $case: "valueDouble",
+        valueDouble: Parameter_ValueDouble.fromPartial(
+          object.value.valueDouble
+        ),
+      };
     }
     return message;
   },
@@ -622,8 +640,6 @@ export const Parameter_ValueString = {
     const message = { ...baseParameter_ValueString } as Parameter_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = String(object.value);
-    } else {
-      message.value = "";
     }
     return message;
   },
@@ -640,8 +656,6 @@ export const Parameter_ValueString = {
     const message = { ...baseParameter_ValueString } as Parameter_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
-    } else {
-      message.value = "";
     }
     return message;
   },
@@ -682,8 +696,6 @@ export const Parameter_ValueBool = {
     const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = Boolean(object.value);
-    } else {
-      message.value = false;
     }
     return message;
   },
@@ -698,8 +710,6 @@ export const Parameter_ValueBool = {
     const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
-    } else {
-      message.value = false;
     }
     return message;
   },
@@ -752,18 +762,12 @@ export const Parameter_ValueUint32 = {
     const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
-    } else {
-      message.value = 0;
     }
     if (object.min !== undefined && object.min !== null) {
       message.min = Number(object.min);
-    } else {
-      message.min = undefined;
     }
     if (object.max !== undefined && object.max !== null) {
       message.max = Number(object.max);
-    } else {
-      message.max = undefined;
     }
     return message;
   },
@@ -782,18 +786,12 @@ export const Parameter_ValueUint32 = {
     const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
-    } else {
-      message.value = 0;
     }
     if (object.min !== undefined && object.min !== null) {
       message.min = object.min;
-    } else {
-      message.min = undefined;
     }
     if (object.max !== undefined && object.max !== null) {
       message.max = object.max;
-    } else {
-      message.max = undefined;
     }
     return message;
   },
@@ -846,18 +844,12 @@ export const Parameter_ValueDouble = {
     const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
-    } else {
-      message.value = 0;
     }
     if (object.min !== undefined && object.min !== null) {
       message.min = Number(object.min);
-    } else {
-      message.min = undefined;
     }
     if (object.max !== undefined && object.max !== null) {
       message.max = Number(object.max);
-    } else {
-      message.max = undefined;
     }
     return message;
   },
@@ -876,18 +868,12 @@ export const Parameter_ValueDouble = {
     const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
-    } else {
-      message.value = 0;
     }
     if (object.min !== undefined && object.min !== null) {
       message.min = object.min;
-    } else {
-      message.min = undefined;
     }
     if (object.max !== undefined && object.max !== null) {
       message.max = object.max;
-    } else {
-      message.max = undefined;
     }
     return message;
   },
@@ -939,13 +925,9 @@ export const Source = {
     message.parameters = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = sourceTypeFromJSON(object.type);
-    } else {
-      message.type = 0;
     }
     if (object.subType !== undefined && object.subType !== null) {
       message.subType = sourceSubTypeFromJSON(object.subType);
-    } else {
-      message.subType = 0;
     }
     if (object.parameters !== undefined && object.parameters !== null) {
       for (const e of object.parameters) {
@@ -975,13 +957,9 @@ export const Source = {
     message.parameters = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = object.type;
-    } else {
-      message.type = 0;
     }
     if (object.subType !== undefined && object.subType !== null) {
       message.subType = object.subType;
-    } else {
-      message.subType = 0;
     }
     if (object.parameters !== undefined && object.parameters !== null) {
       for (const e of object.parameters) {
@@ -1032,8 +1010,6 @@ export const Encoder = {
     message.parameters = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = encoderTypeFromJSON(object.type);
-    } else {
-      message.type = 0;
     }
     if (object.parameters !== undefined && object.parameters !== null) {
       for (const e of object.parameters) {
@@ -1061,8 +1037,6 @@ export const Encoder = {
     message.parameters = [];
     if (object.type !== undefined && object.type !== null) {
       message.type = object.type;
-    } else {
-      message.type = 0;
     }
     if (object.parameters !== undefined && object.parameters !== null) {
       for (const e of object.parameters) {
@@ -1123,8 +1097,6 @@ export const ServerInfo = {
     message.availableEncoders = [];
     if (object.platform !== undefined && object.platform !== null) {
       message.platform = platformFromJSON(object.platform);
-    } else {
-      message.platform = 0;
     }
     if (
       object.availableSources !== undefined &&
@@ -1172,8 +1144,6 @@ export const ServerInfo = {
     message.availableEncoders = [];
     if (object.platform !== undefined && object.platform !== null) {
       message.platform = object.platform;
-    } else {
-      message.platform = 0;
     }
     if (
       object.availableSources !== undefined &&
@@ -1321,23 +1291,15 @@ export const StreamsChange_StreamChange = {
     } as StreamsChange_StreamChange;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
-    } else {
-      message.id = 0;
     }
     if (object.source !== undefined && object.source !== null) {
       message.source = Source.fromJSON(object.source);
-    } else {
-      message.source = undefined;
     }
     if (object.encoder !== undefined && object.encoder !== null) {
       message.encoder = Encoder.fromJSON(object.encoder);
-    } else {
-      message.encoder = undefined;
     }
     if (object.command !== undefined && object.command !== null) {
       message.command = commandFromJSON(object.command);
-    } else {
-      message.command = undefined;
     }
     return message;
   },
@@ -1367,23 +1329,15 @@ export const StreamsChange_StreamChange = {
     } as StreamsChange_StreamChange;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
-    } else {
-      message.id = 0;
     }
     if (object.source !== undefined && object.source !== null) {
       message.source = Source.fromPartial(object.source);
-    } else {
-      message.source = undefined;
     }
     if (object.encoder !== undefined && object.encoder !== null) {
       message.encoder = Encoder.fromPartial(object.encoder);
-    } else {
-      message.encoder = undefined;
     }
     if (object.command !== undefined && object.command !== null) {
       message.command = object.command;
-    } else {
-      message.command = undefined;
     }
     return message;
   },
@@ -1458,36 +1412,24 @@ export const StreamStatistics = {
     const message = { ...baseStreamStatistics } as StreamStatistics;
     if (object.lastFrame !== undefined && object.lastFrame !== null) {
       message.lastFrame = Number(object.lastFrame);
-    } else {
-      message.lastFrame = 0;
     }
     if (object.averageFrameQp !== undefined && object.averageFrameQp !== null) {
       message.averageFrameQp = Number(object.averageFrameQp);
-    } else {
-      message.averageFrameQp = 0;
     }
     if (
       object.encodeTsStartMs !== undefined &&
       object.encodeTsStartMs !== null
     ) {
       message.encodeTsStartMs = Number(object.encodeTsStartMs);
-    } else {
-      message.encodeTsStartMs = 0;
     }
     if (object.encodeTsEndMs !== undefined && object.encodeTsEndMs !== null) {
       message.encodeTsEndMs = Number(object.encodeTsEndMs);
-    } else {
-      message.encodeTsEndMs = 0;
     }
     if (object.txTsStartMs !== undefined && object.txTsStartMs !== null) {
       message.txTsStartMs = Number(object.txTsStartMs);
-    } else {
-      message.txTsStartMs = 0;
     }
     if (object.txTsEndMs !== undefined && object.txTsEndMs !== null) {
       message.txTsEndMs = Number(object.txTsEndMs);
-    } else {
-      message.txTsEndMs = 0;
     }
     return message;
   },
@@ -1511,36 +1453,24 @@ export const StreamStatistics = {
     const message = { ...baseStreamStatistics } as StreamStatistics;
     if (object.lastFrame !== undefined && object.lastFrame !== null) {
       message.lastFrame = object.lastFrame;
-    } else {
-      message.lastFrame = 0;
     }
     if (object.averageFrameQp !== undefined && object.averageFrameQp !== null) {
       message.averageFrameQp = object.averageFrameQp;
-    } else {
-      message.averageFrameQp = 0;
     }
     if (
       object.encodeTsStartMs !== undefined &&
       object.encodeTsStartMs !== null
     ) {
       message.encodeTsStartMs = object.encodeTsStartMs;
-    } else {
-      message.encodeTsStartMs = 0;
     }
     if (object.encodeTsEndMs !== undefined && object.encodeTsEndMs !== null) {
       message.encodeTsEndMs = object.encodeTsEndMs;
-    } else {
-      message.encodeTsEndMs = 0;
     }
     if (object.txTsStartMs !== undefined && object.txTsStartMs !== null) {
       message.txTsStartMs = object.txTsStartMs;
-    } else {
-      message.txTsStartMs = 0;
     }
     if (object.txTsEndMs !== undefined && object.txTsEndMs !== null) {
       message.txTsEndMs = object.txTsEndMs;
-    } else {
-      message.txTsEndMs = 0;
     }
     return message;
   },
@@ -1586,8 +1516,6 @@ export const StreamData = {
     message.payload = new Uint8Array();
     if (object.streamId !== undefined && object.streamId !== null) {
       message.streamId = Number(object.streamId);
-    } else {
-      message.streamId = 0;
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = bytesFromBase64(object.payload);
@@ -1609,13 +1537,9 @@ export const StreamData = {
     const message = { ...baseStreamData } as StreamData;
     if (object.streamId !== undefined && object.streamId !== null) {
       message.streamId = object.streamId;
-    } else {
-      message.streamId = 0;
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = object.payload;
-    } else {
-      message.payload = new Uint8Array();
     }
     return message;
   },
@@ -1628,17 +1552,23 @@ export const Message = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (message.serverInfo !== undefined) {
-      ServerInfo.encode(message.serverInfo, writer.uint32(18).fork()).ldelim();
+    if (message.message?.$case === "serverInfo") {
+      ServerInfo.encode(
+        message.message.serverInfo,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
-    if (message.streamChange !== undefined) {
+    if (message.message?.$case === "streamChange") {
       StreamsChange.encode(
-        message.streamChange,
+        message.message.streamChange,
         writer.uint32(26).fork()
       ).ldelim();
     }
-    if (message.streamData !== undefined) {
-      StreamData.encode(message.streamData, writer.uint32(34).fork()).ldelim();
+    if (message.message?.$case === "streamData") {
+      StreamData.encode(
+        message.message.streamData,
+        writer.uint32(34).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1654,13 +1584,22 @@ export const Message = {
           message.type = reader.int32() as any;
           break;
         case 2:
-          message.serverInfo = ServerInfo.decode(reader, reader.uint32());
+          message.message = {
+            $case: "serverInfo",
+            serverInfo: ServerInfo.decode(reader, reader.uint32()),
+          };
           break;
         case 3:
-          message.streamChange = StreamsChange.decode(reader, reader.uint32());
+          message.message = {
+            $case: "streamChange",
+            streamChange: StreamsChange.decode(reader, reader.uint32()),
+          };
           break;
         case 4:
-          message.streamData = StreamData.decode(reader, reader.uint32());
+          message.message = {
+            $case: "streamData",
+            streamData: StreamData.decode(reader, reader.uint32()),
+          };
           break;
         default:
           reader.skipType(tag & 7);
@@ -1674,23 +1613,24 @@ export const Message = {
     const message = { ...baseMessage } as Message;
     if (object.type !== undefined && object.type !== null) {
       message.type = messageTypeFromJSON(object.type);
-    } else {
-      message.type = 0;
     }
     if (object.serverInfo !== undefined && object.serverInfo !== null) {
-      message.serverInfo = ServerInfo.fromJSON(object.serverInfo);
-    } else {
-      message.serverInfo = undefined;
+      message.message = {
+        $case: "serverInfo",
+        serverInfo: ServerInfo.fromJSON(object.serverInfo),
+      };
     }
     if (object.streamChange !== undefined && object.streamChange !== null) {
-      message.streamChange = StreamsChange.fromJSON(object.streamChange);
-    } else {
-      message.streamChange = undefined;
+      message.message = {
+        $case: "streamChange",
+        streamChange: StreamsChange.fromJSON(object.streamChange),
+      };
     }
     if (object.streamData !== undefined && object.streamData !== null) {
-      message.streamData = StreamData.fromJSON(object.streamData);
-    } else {
-      message.streamData = undefined;
+      message.message = {
+        $case: "streamData",
+        streamData: StreamData.fromJSON(object.streamData),
+      };
     }
     return message;
   },
@@ -1698,17 +1638,17 @@ export const Message = {
   toJSON(message: Message): unknown {
     const obj: any = {};
     message.type !== undefined && (obj.type = messageTypeToJSON(message.type));
-    message.serverInfo !== undefined &&
-      (obj.serverInfo = message.serverInfo
-        ? ServerInfo.toJSON(message.serverInfo)
+    message.message?.$case === "serverInfo" &&
+      (obj.serverInfo = message.message?.serverInfo
+        ? ServerInfo.toJSON(message.message?.serverInfo)
         : undefined);
-    message.streamChange !== undefined &&
-      (obj.streamChange = message.streamChange
-        ? StreamsChange.toJSON(message.streamChange)
+    message.message?.$case === "streamChange" &&
+      (obj.streamChange = message.message?.streamChange
+        ? StreamsChange.toJSON(message.message?.streamChange)
         : undefined);
-    message.streamData !== undefined &&
-      (obj.streamData = message.streamData
-        ? StreamData.toJSON(message.streamData)
+    message.message?.$case === "streamData" &&
+      (obj.streamData = message.message?.streamData
+        ? StreamData.toJSON(message.message?.streamData)
         : undefined);
     return obj;
   },
@@ -1717,23 +1657,36 @@ export const Message = {
     const message = { ...baseMessage } as Message;
     if (object.type !== undefined && object.type !== null) {
       message.type = object.type;
-    } else {
-      message.type = 0;
     }
-    if (object.serverInfo !== undefined && object.serverInfo !== null) {
-      message.serverInfo = ServerInfo.fromPartial(object.serverInfo);
-    } else {
-      message.serverInfo = undefined;
+    if (
+      object.message?.$case === "serverInfo" &&
+      object.message?.serverInfo !== undefined &&
+      object.message?.serverInfo !== null
+    ) {
+      message.message = {
+        $case: "serverInfo",
+        serverInfo: ServerInfo.fromPartial(object.message.serverInfo),
+      };
     }
-    if (object.streamChange !== undefined && object.streamChange !== null) {
-      message.streamChange = StreamsChange.fromPartial(object.streamChange);
-    } else {
-      message.streamChange = undefined;
+    if (
+      object.message?.$case === "streamChange" &&
+      object.message?.streamChange !== undefined &&
+      object.message?.streamChange !== null
+    ) {
+      message.message = {
+        $case: "streamChange",
+        streamChange: StreamsChange.fromPartial(object.message.streamChange),
+      };
     }
-    if (object.streamData !== undefined && object.streamData !== null) {
-      message.streamData = StreamData.fromPartial(object.streamData);
-    } else {
-      message.streamData = undefined;
+    if (
+      object.message?.$case === "streamData" &&
+      object.message?.streamData !== undefined &&
+      object.message?.streamData !== null
+    ) {
+      message.message = {
+        $case: "streamData",
+        streamData: StreamData.fromPartial(object.message.streamData),
+      };
     }
     return message;
   },
@@ -1783,18 +1736,12 @@ export const StreamDataPointer = {
     const message = { ...baseStreamDataPointer } as StreamDataPointer;
     if (object.absx !== undefined && object.absx !== null) {
       message.absx = Number(object.absx);
-    } else {
-      message.absx = 0;
     }
     if (object.absy !== undefined && object.absy !== null) {
       message.absy = Number(object.absy);
-    } else {
-      message.absy = 0;
     }
     if (object.mask !== undefined && object.mask !== null) {
       message.mask = Number(object.mask);
-    } else {
-      message.mask = undefined;
     }
     return message;
   },
@@ -1811,18 +1758,12 @@ export const StreamDataPointer = {
     const message = { ...baseStreamDataPointer } as StreamDataPointer;
     if (object.absx !== undefined && object.absx !== null) {
       message.absx = object.absx;
-    } else {
-      message.absx = 0;
     }
     if (object.absy !== undefined && object.absy !== null) {
       message.absy = object.absy;
-    } else {
-      message.absy = 0;
     }
     if (object.mask !== undefined && object.mask !== null) {
       message.mask = object.mask;
-    } else {
-      message.mask = undefined;
     }
     return message;
   },
@@ -1875,18 +1816,12 @@ export const StreamDataKeyboard = {
     const message = { ...baseStreamDataKeyboard } as StreamDataKeyboard;
     if (object.keysym !== undefined && object.keysym !== null) {
       message.keysym = Number(object.keysym);
-    } else {
-      message.keysym = 0;
     }
     if (object.keycode !== undefined && object.keycode !== null) {
       message.keycode = Number(object.keycode);
-    } else {
-      message.keycode = 0;
     }
     if (object.down !== undefined && object.down !== null) {
       message.down = Boolean(object.down);
-    } else {
-      message.down = false;
     }
     return message;
   },
@@ -1903,18 +1838,12 @@ export const StreamDataKeyboard = {
     const message = { ...baseStreamDataKeyboard } as StreamDataKeyboard;
     if (object.keysym !== undefined && object.keysym !== null) {
       message.keysym = object.keysym;
-    } else {
-      message.keysym = 0;
     }
     if (object.keycode !== undefined && object.keycode !== null) {
       message.keycode = object.keycode;
-    } else {
-      message.keycode = 0;
     }
     if (object.down !== undefined && object.down !== null) {
       message.down = object.down;
-    } else {
-      message.down = false;
     }
     return message;
   },
@@ -1967,6 +1896,10 @@ export type DeepPartial<T> = T extends Builtin
   ? Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
+  : T extends { $case: string }
+  ? { [K in keyof Omit<T, "$case">]?: DeepPartial<T[K]> } & {
+      $case: T["$case"];
+    }
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;

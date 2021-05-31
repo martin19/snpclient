@@ -1,4 +1,4 @@
-import {H264Decoder as H264Core} from "../h264decoder/src/index";
+import {H264Decoder as H264Core} from "../src/index";
 
 const decoder:H264Core = new H264Core();
 const decoderPromise = decoder.init();

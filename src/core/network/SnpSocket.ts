@@ -39,16 +39,16 @@ export class SnpSocket {
   messageHandler(e:MessageEvent) {
     if(e.data instanceof ArrayBuffer) {
       const message = Message.decode(new Uint8Array(e.data));
-      switch(message.type) {
-        case MessageType.MESSAGE_TYPE_SERVER_INFO: {
-          this.onServerInfo(message.serverInfo);
-        } break;
-        case MessageType.MESSAGE_TYPE_STREAMS_CHANGE: {
-          this.onStreamChange(message.streamChange);
-        } break;
-        case MessageType.MESSAGE_TYPE_STREAM_DATA: {
-          this.onStreamData(message.streamData);
-        } break;
+      switch(message.message.$case) {
+        case "serverInfo":
+          this.onServerInfo(message.message.serverInfo);
+          break;
+        case "streamChange":
+          this.onStreamChange(message.message.streamChange);
+          break;
+        case "streamData":
+          this.onStreamData(message.message.streamData)
+          break;
         default: {
           console.log("received invalid message");
         }

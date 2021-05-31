@@ -53,7 +53,7 @@ export class SnpClient {
       url : options.url,
       onServerInfo : this.onServerInfo.bind(this),
       onStreamsChange : this.onStreamsChange.bind(this),
-      onStreamData : this.onStreamData.bind(this) //TODO: connect listeners.
+      onStreamData : this.onStreamData.bind(this)
     });
 
     this.streamListeners = new Map();
@@ -139,17 +139,17 @@ export class SnpClient {
             type : SourceType.SOURCE_TYPE_VIDEO,
             subType : SourceSubType.SOURCE_SUB_TYPE_X11,
             parameters : [
-              { paramType : ParameterType.PARAMETER_TYPE_UINT32, paramKey : "width", valueUint32 : { value : 1920 } },
-              { paramType : ParameterType.PARAMETER_TYPE_UINT32, paramKey : "height", valueUint32 : { value : 1080 } },
+              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "width", value : { $case:"valueUint32", valueUint32 : { value : 1920 } }},
+              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "height", value: { $case:"valueUint32", valueUint32 : { value : 1080 } }},
             ]
           },
           encoder : {
             type : EncoderType.ENCODER_TYPE_H264_HARDWARE,
             parameters : [
-              { paramType : ParameterType.PARAMETER_TYPE_UINT32, paramKey : "qp", valueUint32 : { value : 10 } },
-              { paramType : ParameterType.PARAMETER_TYPE_DOUBLE, paramKey : "unknownDouble", valueDouble : { value : 1.0 } },
-              { paramType : ParameterType.PARAMETER_TYPE_BOOL, paramKey : "unknownBool", valueBool : { value : true }},
-              { paramType : ParameterType.PARAMETER_TYPE_STRING, paramKey : "unknownString", valueString : { value : "foo" }},
+              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "qp", value: { $case:"valueUint32", valueUint32 : { value : 10 } }},
+              { type : ParameterType.PARAMETER_TYPE_DOUBLE, key : "unknownDouble", value: { $case:"valueDouble", valueDouble : { value : 1.0 } }},
+              { type : ParameterType.PARAMETER_TYPE_BOOL, key : "unknownBool", value: { $case:"valueBool", valueBool : { value : true }}},
+              { type : ParameterType.PARAMETER_TYPE_STRING, key : "unknownString", value: { $case:"valueString", valueString : { value : "foo" }}},
             ]
           }
         },
@@ -180,6 +180,12 @@ export class SnpClient {
 
   public setStreamListener(streamId : number, cb : OnDataCallback) {
     this.streamListeners.set(streamId, cb);
+  }
+
+  public onStreamData(streamData:StreamData) {
+    const streamId = streamData.streamId;
+    const listener = this.streamListeners.get(streamId);
+    listener?.(streamData.payload, true);
   }
 
   public sendStreamData(streamId : number, buffer : Uint8Array) {
