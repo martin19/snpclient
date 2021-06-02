@@ -64,12 +64,20 @@ export class SnpSocket {
   sendStreamsChange(streamsChange:StreamsChange) {
     let msg:Message = {
       type : MessageType.MESSAGE_TYPE_STREAMS_CHANGE,
-      streamChange : streamsChange
+      message : {
+        $case : "streamChange", streamChange : streamsChange
+      }
     } as Message;
     this.socket.send(Message.encode(msg).finish());
   }
 
-  send(msg:Message) {
+  sendStreamData(streamData:StreamData) {
+    let msg:Message = {
+      type : MessageType.MESSAGE_TYPE_STREAM_DATA,
+      message : {
+        $case : "streamData", streamData : streamData
+      }
+    };
     this.socket.send(Message.encode(msg).finish());
   }
 }

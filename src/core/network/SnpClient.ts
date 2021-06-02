@@ -216,14 +216,11 @@ export class SnpClient {
   }
 
   public sendStreamData(streamId : number, buffer : Uint8Array) {
-      let msg:Message = {
-        type : MessageType.MESSAGE_TYPE_STREAM_DATA,
-        streamData : {
-          streamId : streamId,
-          payload : buffer
-        }
-      } as Message;
+      let streamData:StreamData = {
+        streamId : streamId,
+        payload : buffer
+      };
 
-      this.socket.send(msg);
+      this.socket.sendStreamData(streamData);
   }
 }

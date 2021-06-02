@@ -4,6 +4,7 @@ export default class SnpStreamElement extends HTMLElement {
 
   shadow : ShadowRoot;
   inputElement : HTMLDivElement;
+  wrapperElement : HTMLDivElement;
   canvasElement : HTMLCanvasElement;
   snpStreamCanvas : SnpStreamCanvas;
   toggleFullsceenEvent : CustomEvent;
@@ -36,6 +37,9 @@ export default class SnpStreamElement extends HTMLElement {
                 } 
                 
                 #canvas, #input {
+                    position:absolute;
+                    top:0;
+                    left:0;
                     width : 100%;
                     height : 100%;
                 }              
@@ -76,6 +80,9 @@ export default class SnpStreamElement extends HTMLElement {
 
     //input element
     this.inputElement = this.shadow.getElementById("input") as HTMLDivElement;
+
+    //wrapper element
+    this.wrapperElement = this.shadow.getElementById("wrapper") as HTMLDivElement;
 
     //cursor
     this.cursorCanvas = document.createElement("canvas");
@@ -118,11 +125,11 @@ export default class SnpStreamElement extends HTMLElement {
   }
 
   addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
-    this.inputElement.addEventListener(type, listener, options);
+    this.wrapperElement.addEventListener(type, listener, options);
   }
 
   removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions) {
-    this.inputElement.removeEventListener(type, listener, options);
+    this.wrapperElement.removeEventListener(type, listener, options);
   }
 
   connectedCallback() {

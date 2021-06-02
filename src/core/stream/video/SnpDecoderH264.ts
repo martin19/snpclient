@@ -1,4 +1,4 @@
-import SnpDecoderWorkerH264 from 'worker-loader!./worker/SnpDecoderWorkerH264';
+import SnpDecoderWorkerH264 from 'worker-loader!./h264decoder/worker/SnpDecoderWorkerH264';
 import {WebGLFrameSink} from "./yuvcanvas/WebGLFrameSink";
 import {SnpComponent, SnpComponentOptions} from "../SnpComponent";
 import {SnpPort} from "../SnpPort";
@@ -20,6 +20,9 @@ export class SnpDecoderH264 extends SnpComponent {
   decodePromiseResolve? : (data:Uint8Array)=>void;
   decodePromiseReject? : (data:Uint8Array)=>void;
   webglFrameSink? : WebGLFrameSink;
+  decoding : boolean;
+
+  inputBuffer : Uint8Array[];
 
   constructor(options:SnpDecoderH264Options) {
     super(options);
@@ -39,22 +42,35 @@ export class SnpDecoderH264 extends SnpComponent {
       const { type, params } = event.data;
       if(type === "onDecode") {
         console.log(`decode success`);
+        this.getOutputPort(0).onData(new Uint8Array(params.output), true);
       } else if(type === "onDecodeError") {
         console.log(`decode error`);
       }
-      this.getOutputPort(0).onData(new Uint8Array(params.output), true);
-    });
-  }
 
-  onInputData(data:Uint8Array, complete?:boolean) {
-    this.inputSabArray.set(data);
-    this.snpDecoderWorkerH264.postMessage({
-      type: "decode",
-      params: {
-        input: this.inputSab,
-        inputLen: data.length,
-        output: this.outputSab
+      this.decoding = false;
+      if(this.inputBuffer.length > 0) {
+        this.onInputData(null);
       }
     });
+
+    this.inputBuffer = [];
+  }
+
+  onInputData(data:Uint8Array|null, complete?:boolean) {
+    if(data) this.inputBuffer.unshift(data);
+
+    if(!this.decoding) {
+      this.decoding = true;
+      const data = this.inputBuffer.pop();
+      this.inputSabArray.set(data);
+      this.snpDecoderWorkerH264.postMessage({
+        type: "decode",
+        params: {
+          input: this.inputSab,
+          inputLen: data.length,
+          output: this.outputSab
+        }
+      });
+    }
   }
 }
