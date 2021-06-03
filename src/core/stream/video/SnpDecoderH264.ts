@@ -9,6 +9,11 @@ export interface SnpDecoderH264Options extends SnpComponentOptions {
   height : number;
 }
 
+let t0 = 0;
+let t1 = 0;
+let statlog:HTMLTextAreaElement = null;
+
+
 export class SnpDecoderH264 extends SnpComponent {
 
   inputSab : SharedArrayBuffer;
@@ -42,7 +47,20 @@ export class SnpDecoderH264 extends SnpComponent {
       const { type, params } = event.data;
       if(type === "onDecode") {
         // console.log(`decode success`);
+        t1 = performance.now();
+        if(statlog === null) {
+          statlog = document.querySelector(".stats .stat-log") as HTMLTextAreaElement;
+        }
+        if(statlog) statlog.value = "dec = " + (t1-t0).toFixed(2) + "\n" +
+        "buffered frames = "+this.inputBuffer.length;
+
+        // t0 = performance.now();
         this.getOutputPort(0).onData(new Uint8Array(params.output), true);
+        // t1 = performance.now();
+        // if(displayTime === null) {
+        //   displayTime = document.querySelector(".stats .display-time") as HTMLSpanElement;
+        // }
+        // if(displayTime) displayTime.innerText = "dis = " + (t1-t0).toFixed(2);
       } else if(type === "onDecodeError") {
         console.log(`decode error`);
       }
@@ -63,6 +81,7 @@ export class SnpDecoderH264 extends SnpComponent {
       this.decoding = true;
       const data = this.inputBuffer.pop();
       this.inputSabArray.set(data);
+      t0 = performance.now();
       this.snpDecoderWorkerH264.postMessage({
         type: "decode",
         params: {
