@@ -41,7 +41,7 @@ export class SnpDecoderH264 extends SnpComponent {
     this.snpDecoderWorkerH264.addEventListener("message", (event) => {
       const { type, params } = event.data;
       if(type === "onDecode") {
-        console.log(`decode success`);
+        // console.log(`decode success`);
         this.getOutputPort(0).onData(new Uint8Array(params.output), true);
       } else if(type === "onDecodeError") {
         console.log(`decode error`);

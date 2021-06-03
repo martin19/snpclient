@@ -18,12 +18,13 @@ export class SnpSourceKeyboard extends SnpComponent {
     super(options);
     this.snpStreamElement = options.snpStreamElement;
     this.addOutputPort(new SnpPort({}));
+
     this.onKeyDownHandler = this.onKeyDown.bind(this);
     this.onKeyUpHandler = this.onKeyUp.bind(this);
 
 
-    this.snpStreamElement.addEventListener("keydown", this.onKeyDownHandler);
-    this.snpStreamElement.addEventListener("keyup", this.onKeyUpHandler);
+    this.snpStreamElement.addEventListener("keydown", this.onKeyDownHandler, true);
+    this.snpStreamElement.addEventListener("keyup", this.onKeyUpHandler, true);
   }
 
   onKeyDown(e:KeyboardEvent) {

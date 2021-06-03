@@ -3,7 +3,6 @@ import {SnpStreamCanvas} from "./SnpStreamCanvas";
 export default class SnpStreamElement extends HTMLElement {
 
   shadow : ShadowRoot;
-  inputElement : HTMLDivElement;
   wrapperElement : HTMLDivElement;
   canvasElement : HTMLCanvasElement;
   snpStreamCanvas : SnpStreamCanvas;
@@ -61,10 +60,9 @@ export default class SnpStreamElement extends HTMLElement {
                     background-color:lightblue;
                 } 
             </style>
-            <div id="wrapper">                                
+            <div id="wrapper" tabindex="0">                                
                 <div id="content">
-                    <canvas id="canvas"></canvas>                        
-                    <div id="input"></div>                
+                    <canvas id="canvas"></canvas>                                                          
                 </div>
                 <div id="overlay">
                     <div id="coordinates"></div>
@@ -72,14 +70,11 @@ export default class SnpStreamElement extends HTMLElement {
                 </div>                
             </div>`;
 
-    this.shadow = this.attachShadow({ mode: "closed" });
+    this.shadow = this.attachShadow({ mode: "open" });
     this.shadow.appendChild(template.content.cloneNode(true));
 
     //stream image plane
     this.canvasElement = this.shadow.getElementById("canvas") as HTMLCanvasElement;
-
-    //input element
-    this.inputElement = this.shadow.getElementById("input") as HTMLDivElement;
 
     //wrapper element
     this.wrapperElement = this.shadow.getElementById("wrapper") as HTMLDivElement;
@@ -163,7 +158,7 @@ export default class SnpStreamElement extends HTMLElement {
     ctx.clearRect(0, 0, width, height);
     ctx.putImageData(img, 0, 0);
     let url = canvas.toDataURL();
-    this.inputElement.style.cursor = 'url(' + url + ')' + hotx + ' ' + hoty + ', default';
+    this.wrapperElement.style.cursor = 'url(' + url + ')' + hotx + ' ' + hoty + ', default';
   }
 
   static registerCustomElement() {
