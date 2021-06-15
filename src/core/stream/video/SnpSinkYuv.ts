@@ -12,8 +12,11 @@ export interface SnpSinkYuvOptions extends SnpComponentOptions {
 
 export class SnpSinkYuv extends SnpComponent {
 
-  width: number;
-  height: number;
+  frameWidth: number;
+  frameHeight: number;
+  frameWidthMbAligned : number;
+  frameHeightMbAligned : number;
+
   snpStreamElement : SnpStreamElement;
   canvas: HTMLCanvasElement;
   frameSink: WebGLFrameSink;
@@ -21,19 +24,28 @@ export class SnpSinkYuv extends SnpComponent {
   constructor(options: SnpSinkYuvOptions) {
     super(options);
 
+    this.frameWidth = options.width;
+    this.frameHeight = options.height;
+    this.frameWidthMbAligned = (this.frameWidth + 15) & (~15);
+    this.frameHeightMbAligned = (this.frameHeight + 15) & (~15);
+
     this.addInputPort(new SnpPort({}));
     this.getInputPort(0).onDataCb = this.onInputData.bind(this);
 
     this.snpStreamElement = options.snpStreamElement;
     this.canvas = options.snpStreamElement.canvas;
     this.frameSink = new WebGLFrameSink(this.canvas);
-    this.width = options.width;
-    this.height = options.height;
+    this.frameWidth = options.width;
+    this.frameHeight = options.height;
   }
 
   onInputData(data: Uint8Array, complete? : boolean) {
-    const width = this.width;
-    const height = this.height;
+
+    const width = this.frameWidthMbAligned;
+    const height = this.frameHeightMbAligned;
+    const cropWidth = this.frameWidth;
+    const cropHeight = this.frameHeight;
+
     const frame: YUVFrame = {
       format: YUVBuffer.format({
         width: width,
@@ -42,10 +54,10 @@ export class SnpSinkYuv extends SnpComponent {
         chromaHeight: height / 2,
         cropLeft: 0, // default
         cropTop: 0, // default
-        cropWidth: width, // derived from width
-        cropHeight: height,
-        displayWidth: width, // derived from width via cropWidth
-        displayHeight: height // derived from cropHeight
+        cropWidth: cropWidth, // derived from width
+        cropHeight: cropHeight,
+        displayWidth: cropWidth, // derived from width via cropWidth
+        displayHeight: cropHeight // derived from cropHeight
       }),
       y: {
         bytes: data.subarray(0, width * height),

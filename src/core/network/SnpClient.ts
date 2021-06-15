@@ -65,18 +65,18 @@ export class SnpClient {
       const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
       //TODO: move this somewhere else.
       snpStreamElement.streamWidth = 1920;
-      snpStreamElement.streamHeight = 1088;
+      snpStreamElement.streamHeight = 1080;
       const source = new SnpSourceNetwork({
         streamId : 0,
         client : this
       });
       const decoder = new SnpDecoderH264({
         width : 1920,
-        height : 1088,
+        height : 1080,
       });
       const sink = new SnpSinkYuv({
         width : 1920,
-        height : 1088,
+        height : 1080,
         snpStreamElement : snpStreamElement
       });
       SnpPort.connect(source.getOutputPort(0), decoder.getInputPort(0));

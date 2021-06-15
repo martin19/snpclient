@@ -27,10 +27,21 @@ export class SnpDecoderH264 extends SnpComponent {
   webglFrameSink? : WebGLFrameSink;
   decoding : boolean;
 
+  frameWidth : number;
+  frameHeight : number;
+  frameWidthMbAligned : number;
+  frameHeightMbAligned : number;
+
   inputBuffer : Uint8Array[];
 
   constructor(options:SnpDecoderH264Options) {
     super(options);
+
+    this.frameWidth = options.width;
+    this.frameHeight = options.height;
+
+    this.frameWidthMbAligned = (this.frameWidth + 15) & (~15);
+    this.frameHeightMbAligned = (this.frameHeight + 15) & (~15);
 
     this.addInputPort(new SnpPort({}));
     this.addOutputPort(new SnpPort({}));
@@ -39,7 +50,7 @@ export class SnpDecoderH264 extends SnpComponent {
     this.snpDecoderWorkerH264 = new SnpDecoderWorkerH264(),
     this.inputSab = new SharedArrayBuffer(1000000);
     this.inputSabArray = new Uint8Array(this.inputSab);
-    this.outputSab = new SharedArrayBuffer(1920*1088*3/2);
+    this.outputSab = new SharedArrayBuffer(this.frameWidthMbAligned*this.frameHeightMbAligned*3/2);
     this.outputSabArray = new Uint8Array(this.outputSab);
     //webglFrameSink : new WebGLFrameSink(canvas)
 
