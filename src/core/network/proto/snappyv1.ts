@@ -54,139 +54,171 @@ export function platformToJSON(object: Platform): string {
   }
 }
 
-export enum SourceType {
-  SOURCE_TYPE_VIDEO = 0,
-  SOURCE_TYPE_AUDIO = 1,
-  SOURCE_TYPE_INPUT = 2,
+export enum StreamMedium {
+  STREAM_MEDIUM_VIDEO = 0,
+  STREAM_MEDIUM_AUDIO = 1,
+  STREAM_MEDIUM_PERIPHERIAL = 2,
   UNRECOGNIZED = -1,
 }
 
-export function sourceTypeFromJSON(object: any): SourceType {
+export function streamMediumFromJSON(object: any): StreamMedium {
   switch (object) {
     case 0:
-    case "SOURCE_TYPE_VIDEO":
-      return SourceType.SOURCE_TYPE_VIDEO;
+    case "STREAM_MEDIUM_VIDEO":
+      return StreamMedium.STREAM_MEDIUM_VIDEO;
     case 1:
-    case "SOURCE_TYPE_AUDIO":
-      return SourceType.SOURCE_TYPE_AUDIO;
+    case "STREAM_MEDIUM_AUDIO":
+      return StreamMedium.STREAM_MEDIUM_AUDIO;
     case 2:
-    case "SOURCE_TYPE_INPUT":
-      return SourceType.SOURCE_TYPE_INPUT;
+    case "STREAM_MEDIUM_PERIPHERIAL":
+      return StreamMedium.STREAM_MEDIUM_PERIPHERIAL;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return SourceType.UNRECOGNIZED;
+      return StreamMedium.UNRECOGNIZED;
   }
 }
 
-export function sourceTypeToJSON(object: SourceType): string {
+export function streamMediumToJSON(object: StreamMedium): string {
   switch (object) {
-    case SourceType.SOURCE_TYPE_VIDEO:
-      return "SOURCE_TYPE_VIDEO";
-    case SourceType.SOURCE_TYPE_AUDIO:
-      return "SOURCE_TYPE_AUDIO";
-    case SourceType.SOURCE_TYPE_INPUT:
-      return "SOURCE_TYPE_INPUT";
+    case StreamMedium.STREAM_MEDIUM_VIDEO:
+      return "STREAM_MEDIUM_VIDEO";
+    case StreamMedium.STREAM_MEDIUM_AUDIO:
+      return "STREAM_MEDIUM_AUDIO";
+    case StreamMedium.STREAM_MEDIUM_PERIPHERIAL:
+      return "STREAM_MEDIUM_PERIPHERIAL";
     default:
       return "UNKNOWN";
   }
 }
 
-export enum SourceSubType {
-  SOURCE_SUB_TYPE_X11 = 0,
-  SOURCE_SUB_TYPE_WAYLAND = 1,
-  SOURCE_SUB_TYPE_CAMERA = 2,
-  SOURCE_SUB_TYPE_KEYBOARD = 3,
-  SOURCE_SUB_TYPE_POINTER = 4,
-  SOURCE_SUB_TYPE_CURSOR = 5,
+export enum StreamEndpoint {
+  STREAM_ENDPOINT_X11 = 0,
+  STREAM_ENDPOINT_WAYLAND = 1,
+  STREAM_ENDPOINT_CAMERA = 2,
+  STREAM_ENDPOINT_KEYBOARD = 3,
+  STREAM_ENDPOINT_POINTER = 4,
+  STREAM_ENDPOINT_CURSOR = 5,
   UNRECOGNIZED = -1,
 }
 
-export function sourceSubTypeFromJSON(object: any): SourceSubType {
+export function streamEndpointFromJSON(object: any): StreamEndpoint {
   switch (object) {
     case 0:
-    case "SOURCE_SUB_TYPE_X11":
-      return SourceSubType.SOURCE_SUB_TYPE_X11;
+    case "STREAM_ENDPOINT_X11":
+      return StreamEndpoint.STREAM_ENDPOINT_X11;
     case 1:
-    case "SOURCE_SUB_TYPE_WAYLAND":
-      return SourceSubType.SOURCE_SUB_TYPE_WAYLAND;
+    case "STREAM_ENDPOINT_WAYLAND":
+      return StreamEndpoint.STREAM_ENDPOINT_WAYLAND;
     case 2:
-    case "SOURCE_SUB_TYPE_CAMERA":
-      return SourceSubType.SOURCE_SUB_TYPE_CAMERA;
+    case "STREAM_ENDPOINT_CAMERA":
+      return StreamEndpoint.STREAM_ENDPOINT_CAMERA;
     case 3:
-    case "SOURCE_SUB_TYPE_KEYBOARD":
-      return SourceSubType.SOURCE_SUB_TYPE_KEYBOARD;
+    case "STREAM_ENDPOINT_KEYBOARD":
+      return StreamEndpoint.STREAM_ENDPOINT_KEYBOARD;
     case 4:
-    case "SOURCE_SUB_TYPE_POINTER":
-      return SourceSubType.SOURCE_SUB_TYPE_POINTER;
+    case "STREAM_ENDPOINT_POINTER":
+      return StreamEndpoint.STREAM_ENDPOINT_POINTER;
     case 5:
-    case "SOURCE_SUB_TYPE_CURSOR":
-      return SourceSubType.SOURCE_SUB_TYPE_CURSOR;
+    case "STREAM_ENDPOINT_CURSOR":
+      return StreamEndpoint.STREAM_ENDPOINT_CURSOR;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return SourceSubType.UNRECOGNIZED;
+      return StreamEndpoint.UNRECOGNIZED;
   }
 }
 
-export function sourceSubTypeToJSON(object: SourceSubType): string {
+export function streamEndpointToJSON(object: StreamEndpoint): string {
   switch (object) {
-    case SourceSubType.SOURCE_SUB_TYPE_X11:
-      return "SOURCE_SUB_TYPE_X11";
-    case SourceSubType.SOURCE_SUB_TYPE_WAYLAND:
-      return "SOURCE_SUB_TYPE_WAYLAND";
-    case SourceSubType.SOURCE_SUB_TYPE_CAMERA:
-      return "SOURCE_SUB_TYPE_CAMERA";
-    case SourceSubType.SOURCE_SUB_TYPE_KEYBOARD:
-      return "SOURCE_SUB_TYPE_KEYBOARD";
-    case SourceSubType.SOURCE_SUB_TYPE_POINTER:
-      return "SOURCE_SUB_TYPE_POINTER";
-    case SourceSubType.SOURCE_SUB_TYPE_CURSOR:
-      return "SOURCE_SUB_TYPE_CURSOR";
+    case StreamEndpoint.STREAM_ENDPOINT_X11:
+      return "STREAM_ENDPOINT_X11";
+    case StreamEndpoint.STREAM_ENDPOINT_WAYLAND:
+      return "STREAM_ENDPOINT_WAYLAND";
+    case StreamEndpoint.STREAM_ENDPOINT_CAMERA:
+      return "STREAM_ENDPOINT_CAMERA";
+    case StreamEndpoint.STREAM_ENDPOINT_KEYBOARD:
+      return "STREAM_ENDPOINT_KEYBOARD";
+    case StreamEndpoint.STREAM_ENDPOINT_POINTER:
+      return "STREAM_ENDPOINT_POINTER";
+    case StreamEndpoint.STREAM_ENDPOINT_CURSOR:
+      return "STREAM_ENDPOINT_CURSOR";
     default:
       return "UNKNOWN";
   }
 }
 
-export enum EncoderType {
-  ENCODER_TYPE_H264_SOFTWARE = 0,
-  ENCODER_TYPE_H264_HARDWARE = 1,
-  ENCODER_TYPE_MP3_SOFTWARE = 2,
-  ENCODER_TYPE_MP3_HARDWARE = 3,
+export enum StreamDirection {
+  STREAM_DIRECTION_INPUT = 0,
+  STREAM_DIRECTION_OUTPUT = 1,
   UNRECOGNIZED = -1,
 }
 
-export function encoderTypeFromJSON(object: any): EncoderType {
+export function streamDirectionFromJSON(object: any): StreamDirection {
   switch (object) {
     case 0:
-    case "ENCODER_TYPE_H264_SOFTWARE":
-      return EncoderType.ENCODER_TYPE_H264_SOFTWARE;
+    case "STREAM_DIRECTION_INPUT":
+      return StreamDirection.STREAM_DIRECTION_INPUT;
     case 1:
-    case "ENCODER_TYPE_H264_HARDWARE":
-      return EncoderType.ENCODER_TYPE_H264_HARDWARE;
-    case 2:
-    case "ENCODER_TYPE_MP3_SOFTWARE":
-      return EncoderType.ENCODER_TYPE_MP3_SOFTWARE;
-    case 3:
-    case "ENCODER_TYPE_MP3_HARDWARE":
-      return EncoderType.ENCODER_TYPE_MP3_HARDWARE;
+    case "STREAM_DIRECTION_OUTPUT":
+      return StreamDirection.STREAM_DIRECTION_OUTPUT;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return EncoderType.UNRECOGNIZED;
+      return StreamDirection.UNRECOGNIZED;
   }
 }
 
-export function encoderTypeToJSON(object: EncoderType): string {
+export function streamDirectionToJSON(object: StreamDirection): string {
   switch (object) {
-    case EncoderType.ENCODER_TYPE_H264_SOFTWARE:
-      return "ENCODER_TYPE_H264_SOFTWARE";
-    case EncoderType.ENCODER_TYPE_H264_HARDWARE:
-      return "ENCODER_TYPE_H264_HARDWARE";
-    case EncoderType.ENCODER_TYPE_MP3_SOFTWARE:
-      return "ENCODER_TYPE_MP3_SOFTWARE";
-    case EncoderType.ENCODER_TYPE_MP3_HARDWARE:
-      return "ENCODER_TYPE_MP3_HARDWARE";
+    case StreamDirection.STREAM_DIRECTION_INPUT:
+      return "STREAM_DIRECTION_INPUT";
+    case StreamDirection.STREAM_DIRECTION_OUTPUT:
+      return "STREAM_DIRECTION_OUTPUT";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+export enum StreamEncoding {
+  STREAM_ENCODING_H264_SOFTWARE = 0,
+  STREAM_ENCODING_H264_HARDWARE = 1,
+  STREAM_ENCODING_MP3_SOFTWARE = 2,
+  STREAM_ENCODING_MP3_HARDWARE = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function streamEncodingFromJSON(object: any): StreamEncoding {
+  switch (object) {
+    case 0:
+    case "STREAM_ENCODING_H264_SOFTWARE":
+      return StreamEncoding.STREAM_ENCODING_H264_SOFTWARE;
+    case 1:
+    case "STREAM_ENCODING_H264_HARDWARE":
+      return StreamEncoding.STREAM_ENCODING_H264_HARDWARE;
+    case 2:
+    case "STREAM_ENCODING_MP3_SOFTWARE":
+      return StreamEncoding.STREAM_ENCODING_MP3_SOFTWARE;
+    case 3:
+    case "STREAM_ENCODING_MP3_HARDWARE":
+      return StreamEncoding.STREAM_ENCODING_MP3_HARDWARE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return StreamEncoding.UNRECOGNIZED;
+  }
+}
+
+export function streamEncodingToJSON(object: StreamEncoding): string {
+  switch (object) {
+    case StreamEncoding.STREAM_ENCODING_H264_SOFTWARE:
+      return "STREAM_ENCODING_H264_SOFTWARE";
+    case StreamEncoding.STREAM_ENCODING_H264_HARDWARE:
+      return "STREAM_ENCODING_H264_HARDWARE";
+    case StreamEncoding.STREAM_ENCODING_MP3_SOFTWARE:
+      return "STREAM_ENCODING_MP3_SOFTWARE";
+    case StreamEncoding.STREAM_ENCODING_MP3_HARDWARE:
+      return "STREAM_ENCODING_MP3_HARDWARE";
     default:
       return "UNKNOWN";
   }
@@ -194,9 +226,12 @@ export function encoderTypeToJSON(object: EncoderType): string {
 
 export enum Command {
   COMMAND_INIT = 0,
-  COMMAND_START = 1,
-  COMMAND_STOP = 2,
-  COMMAND_DESTROY = 3,
+  COMMAND_INIT_OK = 1,
+  COMMAND_START = 2,
+  COMMAND_STOP = 3,
+  COMMAND_SET_PARAMETER = 4,
+  COMMAND_DESTROY = 5,
+  COMMAND_ACK = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -206,14 +241,23 @@ export function commandFromJSON(object: any): Command {
     case "COMMAND_INIT":
       return Command.COMMAND_INIT;
     case 1:
+    case "COMMAND_INIT_OK":
+      return Command.COMMAND_INIT_OK;
+    case 2:
     case "COMMAND_START":
       return Command.COMMAND_START;
-    case 2:
+    case 3:
     case "COMMAND_STOP":
       return Command.COMMAND_STOP;
-    case 3:
+    case 4:
+    case "COMMAND_SET_PARAMETER":
+      return Command.COMMAND_SET_PARAMETER;
+    case 5:
     case "COMMAND_DESTROY":
       return Command.COMMAND_DESTROY;
+    case 6:
+    case "COMMAND_ACK":
+      return Command.COMMAND_ACK;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -225,79 +269,85 @@ export function commandToJSON(object: Command): string {
   switch (object) {
     case Command.COMMAND_INIT:
       return "COMMAND_INIT";
+    case Command.COMMAND_INIT_OK:
+      return "COMMAND_INIT_OK";
     case Command.COMMAND_START:
       return "COMMAND_START";
     case Command.COMMAND_STOP:
       return "COMMAND_STOP";
+    case Command.COMMAND_SET_PARAMETER:
+      return "COMMAND_SET_PARAMETER";
     case Command.COMMAND_DESTROY:
       return "COMMAND_DESTROY";
+    case Command.COMMAND_ACK:
+      return "COMMAND_ACK";
     default:
       return "UNKNOWN";
   }
 }
 
-export enum ParameterType {
-  PARAMETER_TYPE_STRING = 0,
-  PARAMETER_TYPE_BOOL = 1,
-  PARAMETER_TYPE_UINT32 = 2,
-  PARAMETER_TYPE_DOUBLE = 3,
+export enum PropertyType {
+  PROPERTY_TYPE_STRING = 0,
+  PROPERTY_TYPE_BOOL = 1,
+  PROPERTY_TYPE_UINT32 = 2,
+  PROPERTY_TYPE_DOUBLE = 3,
   UNRECOGNIZED = -1,
 }
 
-export function parameterTypeFromJSON(object: any): ParameterType {
+export function propertyTypeFromJSON(object: any): PropertyType {
   switch (object) {
     case 0:
-    case "PARAMETER_TYPE_STRING":
-      return ParameterType.PARAMETER_TYPE_STRING;
+    case "PROPERTY_TYPE_STRING":
+      return PropertyType.PROPERTY_TYPE_STRING;
     case 1:
-    case "PARAMETER_TYPE_BOOL":
-      return ParameterType.PARAMETER_TYPE_BOOL;
+    case "PROPERTY_TYPE_BOOL":
+      return PropertyType.PROPERTY_TYPE_BOOL;
     case 2:
-    case "PARAMETER_TYPE_UINT32":
-      return ParameterType.PARAMETER_TYPE_UINT32;
+    case "PROPERTY_TYPE_UINT32":
+      return PropertyType.PROPERTY_TYPE_UINT32;
     case 3:
-    case "PARAMETER_TYPE_DOUBLE":
-      return ParameterType.PARAMETER_TYPE_DOUBLE;
+    case "PROPERTY_TYPE_DOUBLE":
+      return PropertyType.PROPERTY_TYPE_DOUBLE;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return ParameterType.UNRECOGNIZED;
+      return PropertyType.UNRECOGNIZED;
   }
 }
 
-export function parameterTypeToJSON(object: ParameterType): string {
+export function propertyTypeToJSON(object: PropertyType): string {
   switch (object) {
-    case ParameterType.PARAMETER_TYPE_STRING:
-      return "PARAMETER_TYPE_STRING";
-    case ParameterType.PARAMETER_TYPE_BOOL:
-      return "PARAMETER_TYPE_BOOL";
-    case ParameterType.PARAMETER_TYPE_UINT32:
-      return "PARAMETER_TYPE_UINT32";
-    case ParameterType.PARAMETER_TYPE_DOUBLE:
-      return "PARAMETER_TYPE_DOUBLE";
+    case PropertyType.PROPERTY_TYPE_STRING:
+      return "PROPERTY_TYPE_STRING";
+    case PropertyType.PROPERTY_TYPE_BOOL:
+      return "PROPERTY_TYPE_BOOL";
+    case PropertyType.PROPERTY_TYPE_UINT32:
+      return "PROPERTY_TYPE_UINT32";
+    case PropertyType.PROPERTY_TYPE_DOUBLE:
+      return "PROPERTY_TYPE_DOUBLE";
     default:
       return "UNKNOWN";
   }
 }
 
 export enum MessageType {
-  MESSAGE_TYPE_SERVER_INFO = 0,
-  MESSAGE_TYPE_STREAMS_CHANGE = 1,
-  MESSAGE_TYPE_STREAM_DATA = 2,
+  MESSAGE_TYPE_STREAM_CHANGE = 0,
+  MESSAGE_TYPE_STREAM_DATA = 1,
+  MESSAGE_TYPE_STREAM_INFO = 2,
   UNRECOGNIZED = -1,
 }
 
 export function messageTypeFromJSON(object: any): MessageType {
   switch (object) {
     case 0:
-    case "MESSAGE_TYPE_SERVER_INFO":
-      return MessageType.MESSAGE_TYPE_SERVER_INFO;
+    case "MESSAGE_TYPE_STREAM_CHANGE":
+      return MessageType.MESSAGE_TYPE_STREAM_CHANGE;
     case 1:
-    case "MESSAGE_TYPE_STREAMS_CHANGE":
-      return MessageType.MESSAGE_TYPE_STREAMS_CHANGE;
-    case 2:
     case "MESSAGE_TYPE_STREAM_DATA":
       return MessageType.MESSAGE_TYPE_STREAM_DATA;
+    case 2:
+    case "MESSAGE_TYPE_STREAM_INFO":
+      return MessageType.MESSAGE_TYPE_STREAM_INFO;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -307,97 +357,75 @@ export function messageTypeFromJSON(object: any): MessageType {
 
 export function messageTypeToJSON(object: MessageType): string {
   switch (object) {
-    case MessageType.MESSAGE_TYPE_SERVER_INFO:
-      return "MESSAGE_TYPE_SERVER_INFO";
-    case MessageType.MESSAGE_TYPE_STREAMS_CHANGE:
-      return "MESSAGE_TYPE_STREAMS_CHANGE";
+    case MessageType.MESSAGE_TYPE_STREAM_CHANGE:
+      return "MESSAGE_TYPE_STREAM_CHANGE";
     case MessageType.MESSAGE_TYPE_STREAM_DATA:
       return "MESSAGE_TYPE_STREAM_DATA";
+    case MessageType.MESSAGE_TYPE_STREAM_INFO:
+      return "MESSAGE_TYPE_STREAM_INFO";
     default:
       return "UNKNOWN";
   }
 }
 
-export interface Parameter {
-  type: ParameterType;
+export interface Property {
+  type: PropertyType;
   key: string;
   value?:
-    | { $case: "valueString"; valueString: Parameter_ValueString }
-    | { $case: "valueBool"; valueBool: Parameter_ValueBool }
-    | { $case: "valueUint32"; valueUint32: Parameter_ValueUint32 }
-    | { $case: "valueDouble"; valueDouble: Parameter_ValueDouble };
+    | { $case: "valueString"; valueString: Property_ValueString }
+    | { $case: "valueBool"; valueBool: Property_ValueBool }
+    | { $case: "valueUint32"; valueUint32: Property_ValueUint32 }
+    | { $case: "valueDouble"; valueDouble: Property_ValueDouble };
 }
 
-export interface Parameter_ValueString {
+export interface Property_ValueString {
   value: string;
 }
 
-export interface Parameter_ValueBool {
+export interface Property_ValueBool {
   value: boolean;
 }
 
-export interface Parameter_ValueUint32 {
+export interface Property_ValueUint32 {
   value: number;
   min?: number | undefined;
   max?: number | undefined;
 }
 
-export interface Parameter_ValueDouble {
+export interface Property_ValueDouble {
   value: number;
   min?: number | undefined;
   max?: number | undefined;
 }
 
-/** private */
-export interface Source {
-  type: SourceType;
-  subType: SourceSubType;
-  parameters: Parameter[];
-}
-
-/** private */
-export interface Encoder {
-  type: EncoderType;
-  parameters: Parameter[];
-}
-
-export interface ServerInfo {
+export interface StreamInfo {
   platform: Platform;
-  availableSources: Source[];
-  availableEncoders: Encoder[];
+  streamEndpoints: StreamEndpoint[];
+  streamEncodings: StreamEncoding[];
 }
 
-export interface StreamsChange {
-  streams: StreamsChange_StreamChange[];
-}
-
-export interface StreamsChange_StreamChange {
+export interface StreamChange {
   id: number;
-  source?: Source | undefined;
-  encoder?: Encoder | undefined;
-  command?: Command | undefined;
-}
-
-export interface StreamStatistics {
-  lastFrame: number;
-  averageFrameQp: number;
-  encodeTsStartMs: number;
-  encodeTsEndMs: number;
-  txTsStartMs: number;
-  txTsEndMs: number;
+  command: Command;
+  streamMedium: StreamMedium;
+  streamDirection: StreamDirection;
+  streamEndpoint: StreamEndpoint;
+  streamEncoding: StreamEncoding;
+  property: Property[];
 }
 
 export interface StreamData {
   streamId: number;
+  /** optional FrameTiming frame_timing = 3; */
   payload: Uint8Array;
 }
 
 export interface Message {
   type: MessageType;
   message?:
-    | { $case: "serverInfo"; serverInfo: ServerInfo }
-    | { $case: "streamChange"; streamChange: StreamsChange }
-    | { $case: "streamData"; streamData: StreamData };
+    | { $case: "streamChange"; streamChange: StreamChange }
+    | { $case: "streamData"; streamData: StreamData }
+    | { $case: "streamInfo"; streamInfo: StreamInfo };
 }
 
 export interface StreamDataPointer {
@@ -420,10 +448,10 @@ export interface StreamDataCursor {
   image: Uint8Array;
 }
 
-const baseParameter: object = { type: 0, key: "" };
+const baseProperty: object = { type: 0, key: "" };
 
-export const Parameter = {
-  encode(message: Parameter, writer: Writer = Writer.create()): Writer {
+export const Property = {
+  encode(message: Property, writer: Writer = Writer.create()): Writer {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
@@ -431,25 +459,25 @@ export const Parameter = {
       writer.uint32(18).string(message.key);
     }
     if (message.value?.$case === "valueString") {
-      Parameter_ValueString.encode(
+      Property_ValueString.encode(
         message.value.valueString,
         writer.uint32(26).fork()
       ).ldelim();
     }
     if (message.value?.$case === "valueBool") {
-      Parameter_ValueBool.encode(
+      Property_ValueBool.encode(
         message.value.valueBool,
         writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.value?.$case === "valueUint32") {
-      Parameter_ValueUint32.encode(
+      Property_ValueUint32.encode(
         message.value.valueUint32,
         writer.uint32(42).fork()
       ).ldelim();
     }
     if (message.value?.$case === "valueDouble") {
-      Parameter_ValueDouble.encode(
+      Property_ValueDouble.encode(
         message.value.valueDouble,
         writer.uint32(50).fork()
       ).ldelim();
@@ -457,10 +485,10 @@ export const Parameter = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Parameter {
+  decode(input: Reader | Uint8Array, length?: number): Property {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParameter } as Parameter;
+    const message = { ...baseProperty } as Property;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -473,25 +501,25 @@ export const Parameter = {
         case 3:
           message.value = {
             $case: "valueString",
-            valueString: Parameter_ValueString.decode(reader, reader.uint32()),
+            valueString: Property_ValueString.decode(reader, reader.uint32()),
           };
           break;
         case 4:
           message.value = {
             $case: "valueBool",
-            valueBool: Parameter_ValueBool.decode(reader, reader.uint32()),
+            valueBool: Property_ValueBool.decode(reader, reader.uint32()),
           };
           break;
         case 5:
           message.value = {
             $case: "valueUint32",
-            valueUint32: Parameter_ValueUint32.decode(reader, reader.uint32()),
+            valueUint32: Property_ValueUint32.decode(reader, reader.uint32()),
           };
           break;
         case 6:
           message.value = {
             $case: "valueDouble",
-            valueDouble: Parameter_ValueDouble.decode(reader, reader.uint32()),
+            valueDouble: Property_ValueDouble.decode(reader, reader.uint32()),
           };
           break;
         default:
@@ -502,10 +530,10 @@ export const Parameter = {
     return message;
   },
 
-  fromJSON(object: any): Parameter {
-    const message = { ...baseParameter } as Parameter;
+  fromJSON(object: any): Property {
+    const message = { ...baseProperty } as Property;
     if (object.type !== undefined && object.type !== null) {
-      message.type = parameterTypeFromJSON(object.type);
+      message.type = propertyTypeFromJSON(object.type);
     }
     if (object.key !== undefined && object.key !== null) {
       message.key = String(object.key);
@@ -513,56 +541,55 @@ export const Parameter = {
     if (object.valueString !== undefined && object.valueString !== null) {
       message.value = {
         $case: "valueString",
-        valueString: Parameter_ValueString.fromJSON(object.valueString),
+        valueString: Property_ValueString.fromJSON(object.valueString),
       };
     }
     if (object.valueBool !== undefined && object.valueBool !== null) {
       message.value = {
         $case: "valueBool",
-        valueBool: Parameter_ValueBool.fromJSON(object.valueBool),
+        valueBool: Property_ValueBool.fromJSON(object.valueBool),
       };
     }
     if (object.valueUint32 !== undefined && object.valueUint32 !== null) {
       message.value = {
         $case: "valueUint32",
-        valueUint32: Parameter_ValueUint32.fromJSON(object.valueUint32),
+        valueUint32: Property_ValueUint32.fromJSON(object.valueUint32),
       };
     }
     if (object.valueDouble !== undefined && object.valueDouble !== null) {
       message.value = {
         $case: "valueDouble",
-        valueDouble: Parameter_ValueDouble.fromJSON(object.valueDouble),
+        valueDouble: Property_ValueDouble.fromJSON(object.valueDouble),
       };
     }
     return message;
   },
 
-  toJSON(message: Parameter): unknown {
+  toJSON(message: Property): unknown {
     const obj: any = {};
-    message.type !== undefined &&
-      (obj.type = parameterTypeToJSON(message.type));
+    message.type !== undefined && (obj.type = propertyTypeToJSON(message.type));
     message.key !== undefined && (obj.key = message.key);
     message.value?.$case === "valueString" &&
       (obj.valueString = message.value?.valueString
-        ? Parameter_ValueString.toJSON(message.value?.valueString)
+        ? Property_ValueString.toJSON(message.value?.valueString)
         : undefined);
     message.value?.$case === "valueBool" &&
       (obj.valueBool = message.value?.valueBool
-        ? Parameter_ValueBool.toJSON(message.value?.valueBool)
+        ? Property_ValueBool.toJSON(message.value?.valueBool)
         : undefined);
     message.value?.$case === "valueUint32" &&
       (obj.valueUint32 = message.value?.valueUint32
-        ? Parameter_ValueUint32.toJSON(message.value?.valueUint32)
+        ? Property_ValueUint32.toJSON(message.value?.valueUint32)
         : undefined);
     message.value?.$case === "valueDouble" &&
       (obj.valueDouble = message.value?.valueDouble
-        ? Parameter_ValueDouble.toJSON(message.value?.valueDouble)
+        ? Property_ValueDouble.toJSON(message.value?.valueDouble)
         : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Parameter>): Parameter {
-    const message = { ...baseParameter } as Parameter;
+  fromPartial(object: DeepPartial<Property>): Property {
+    const message = { ...baseProperty } as Property;
     if (object.type !== undefined && object.type !== null) {
       message.type = object.type;
     }
@@ -576,9 +603,7 @@ export const Parameter = {
     ) {
       message.value = {
         $case: "valueString",
-        valueString: Parameter_ValueString.fromPartial(
-          object.value.valueString
-        ),
+        valueString: Property_ValueString.fromPartial(object.value.valueString),
       };
     }
     if (
@@ -588,7 +613,7 @@ export const Parameter = {
     ) {
       message.value = {
         $case: "valueBool",
-        valueBool: Parameter_ValueBool.fromPartial(object.value.valueBool),
+        valueBool: Property_ValueBool.fromPartial(object.value.valueBool),
       };
     }
     if (
@@ -598,9 +623,7 @@ export const Parameter = {
     ) {
       message.value = {
         $case: "valueUint32",
-        valueUint32: Parameter_ValueUint32.fromPartial(
-          object.value.valueUint32
-        ),
+        valueUint32: Property_ValueUint32.fromPartial(object.value.valueUint32),
       };
     }
     if (
@@ -610,20 +633,18 @@ export const Parameter = {
     ) {
       message.value = {
         $case: "valueDouble",
-        valueDouble: Parameter_ValueDouble.fromPartial(
-          object.value.valueDouble
-        ),
+        valueDouble: Property_ValueDouble.fromPartial(object.value.valueDouble),
       };
     }
     return message;
   },
 };
 
-const baseParameter_ValueString: object = { value: "" };
+const baseProperty_ValueString: object = { value: "" };
 
-export const Parameter_ValueString = {
+export const Property_ValueString = {
   encode(
-    message: Parameter_ValueString,
+    message: Property_ValueString,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== "") {
@@ -632,10 +653,10 @@ export const Parameter_ValueString = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueString {
+  decode(input: Reader | Uint8Array, length?: number): Property_ValueString {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
+    const message = { ...baseProperty_ValueString } as Property_ValueString;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -650,24 +671,22 @@ export const Parameter_ValueString = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ValueString {
-    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
+  fromJSON(object: any): Property_ValueString {
+    const message = { ...baseProperty_ValueString } as Property_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = String(object.value);
     }
     return message;
   },
 
-  toJSON(message: Parameter_ValueString): unknown {
+  toJSON(message: Property_ValueString): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<Parameter_ValueString>
-  ): Parameter_ValueString {
-    const message = { ...baseParameter_ValueString } as Parameter_ValueString;
+  fromPartial(object: DeepPartial<Property_ValueString>): Property_ValueString {
+    const message = { ...baseProperty_ValueString } as Property_ValueString;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     }
@@ -675,11 +694,11 @@ export const Parameter_ValueString = {
   },
 };
 
-const baseParameter_ValueBool: object = { value: false };
+const baseProperty_ValueBool: object = { value: false };
 
-export const Parameter_ValueBool = {
+export const Property_ValueBool = {
   encode(
-    message: Parameter_ValueBool,
+    message: Property_ValueBool,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value === true) {
@@ -688,10 +707,10 @@ export const Parameter_ValueBool = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueBool {
+  decode(input: Reader | Uint8Array, length?: number): Property_ValueBool {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
+    const message = { ...baseProperty_ValueBool } as Property_ValueBool;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -706,22 +725,22 @@ export const Parameter_ValueBool = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ValueBool {
-    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
+  fromJSON(object: any): Property_ValueBool {
+    const message = { ...baseProperty_ValueBool } as Property_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = Boolean(object.value);
     }
     return message;
   },
 
-  toJSON(message: Parameter_ValueBool): unknown {
+  toJSON(message: Property_ValueBool): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Parameter_ValueBool>): Parameter_ValueBool {
-    const message = { ...baseParameter_ValueBool } as Parameter_ValueBool;
+  fromPartial(object: DeepPartial<Property_ValueBool>): Property_ValueBool {
+    const message = { ...baseProperty_ValueBool } as Property_ValueBool;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     }
@@ -729,11 +748,11 @@ export const Parameter_ValueBool = {
   },
 };
 
-const baseParameter_ValueUint32: object = { value: 0 };
+const baseProperty_ValueUint32: object = { value: 0 };
 
-export const Parameter_ValueUint32 = {
+export const Property_ValueUint32 = {
   encode(
-    message: Parameter_ValueUint32,
+    message: Property_ValueUint32,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== 0) {
@@ -748,10 +767,10 @@ export const Parameter_ValueUint32 = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueUint32 {
+  decode(input: Reader | Uint8Array, length?: number): Property_ValueUint32 {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
+    const message = { ...baseProperty_ValueUint32 } as Property_ValueUint32;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -772,8 +791,8 @@ export const Parameter_ValueUint32 = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ValueUint32 {
-    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
+  fromJSON(object: any): Property_ValueUint32 {
+    const message = { ...baseProperty_ValueUint32 } as Property_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
     }
@@ -786,7 +805,7 @@ export const Parameter_ValueUint32 = {
     return message;
   },
 
-  toJSON(message: Parameter_ValueUint32): unknown {
+  toJSON(message: Property_ValueUint32): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     message.min !== undefined && (obj.min = message.min);
@@ -794,10 +813,8 @@ export const Parameter_ValueUint32 = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<Parameter_ValueUint32>
-  ): Parameter_ValueUint32 {
-    const message = { ...baseParameter_ValueUint32 } as Parameter_ValueUint32;
+  fromPartial(object: DeepPartial<Property_ValueUint32>): Property_ValueUint32 {
+    const message = { ...baseProperty_ValueUint32 } as Property_ValueUint32;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     }
@@ -811,11 +828,11 @@ export const Parameter_ValueUint32 = {
   },
 };
 
-const baseParameter_ValueDouble: object = { value: 0 };
+const baseProperty_ValueDouble: object = { value: 0 };
 
-export const Parameter_ValueDouble = {
+export const Property_ValueDouble = {
   encode(
-    message: Parameter_ValueDouble,
+    message: Property_ValueDouble,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.value !== 0) {
@@ -830,10 +847,10 @@ export const Parameter_ValueDouble = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Parameter_ValueDouble {
+  decode(input: Reader | Uint8Array, length?: number): Property_ValueDouble {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
+    const message = { ...baseProperty_ValueDouble } as Property_ValueDouble;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -854,8 +871,8 @@ export const Parameter_ValueDouble = {
     return message;
   },
 
-  fromJSON(object: any): Parameter_ValueDouble {
-    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
+  fromJSON(object: any): Property_ValueDouble {
+    const message = { ...baseProperty_ValueDouble } as Property_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = Number(object.value);
     }
@@ -868,7 +885,7 @@ export const Parameter_ValueDouble = {
     return message;
   },
 
-  toJSON(message: Parameter_ValueDouble): unknown {
+  toJSON(message: Property_ValueDouble): unknown {
     const obj: any = {};
     message.value !== undefined && (obj.value = message.value);
     message.min !== undefined && (obj.min = message.min);
@@ -876,10 +893,8 @@ export const Parameter_ValueDouble = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<Parameter_ValueDouble>
-  ): Parameter_ValueDouble {
-    const message = { ...baseParameter_ValueDouble } as Parameter_ValueDouble;
+  fromPartial(object: DeepPartial<Property_ValueDouble>): Property_ValueDouble {
+    const message = { ...baseProperty_ValueDouble } as Property_ValueDouble;
     if (object.value !== undefined && object.value !== null) {
       message.value = object.value;
     }
@@ -893,209 +908,61 @@ export const Parameter_ValueDouble = {
   },
 };
 
-const baseSource: object = { type: 0, subType: 0 };
-
-export const Source = {
-  encode(message: Source, writer: Writer = Writer.create()): Writer {
-    if (message.type !== 0) {
-      writer.uint32(8).int32(message.type);
-    }
-    if (message.subType !== 0) {
-      writer.uint32(16).int32(message.subType);
-    }
-    for (const v of message.parameters) {
-      Parameter.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): Source {
-    const reader = input instanceof Reader ? input : new Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSource } as Source;
-    message.parameters = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.type = reader.int32() as any;
-          break;
-        case 2:
-          message.subType = reader.int32() as any;
-          break;
-        case 3:
-          message.parameters.push(Parameter.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Source {
-    const message = { ...baseSource } as Source;
-    message.parameters = [];
-    if (object.type !== undefined && object.type !== null) {
-      message.type = sourceTypeFromJSON(object.type);
-    }
-    if (object.subType !== undefined && object.subType !== null) {
-      message.subType = sourceSubTypeFromJSON(object.subType);
-    }
-    if (object.parameters !== undefined && object.parameters !== null) {
-      for (const e of object.parameters) {
-        message.parameters.push(Parameter.fromJSON(e));
-      }
-    }
-    return message;
-  },
-
-  toJSON(message: Source): unknown {
-    const obj: any = {};
-    message.type !== undefined && (obj.type = sourceTypeToJSON(message.type));
-    message.subType !== undefined &&
-      (obj.subType = sourceSubTypeToJSON(message.subType));
-    if (message.parameters) {
-      obj.parameters = message.parameters.map((e) =>
-        e ? Parameter.toJSON(e) : undefined
-      );
-    } else {
-      obj.parameters = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Source>): Source {
-    const message = { ...baseSource } as Source;
-    message.parameters = [];
-    if (object.type !== undefined && object.type !== null) {
-      message.type = object.type;
-    }
-    if (object.subType !== undefined && object.subType !== null) {
-      message.subType = object.subType;
-    }
-    if (object.parameters !== undefined && object.parameters !== null) {
-      for (const e of object.parameters) {
-        message.parameters.push(Parameter.fromPartial(e));
-      }
-    }
-    return message;
-  },
+const baseStreamInfo: object = {
+  platform: 0,
+  streamEndpoints: 0,
+  streamEncodings: 0,
 };
 
-const baseEncoder: object = { type: 0 };
-
-export const Encoder = {
-  encode(message: Encoder, writer: Writer = Writer.create()): Writer {
-    if (message.type !== 0) {
-      writer.uint32(8).int32(message.type);
-    }
-    for (const v of message.parameters) {
-      Parameter.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): Encoder {
-    const reader = input instanceof Reader ? input : new Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseEncoder } as Encoder;
-    message.parameters = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.type = reader.int32() as any;
-          break;
-        case 2:
-          message.parameters.push(Parameter.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Encoder {
-    const message = { ...baseEncoder } as Encoder;
-    message.parameters = [];
-    if (object.type !== undefined && object.type !== null) {
-      message.type = encoderTypeFromJSON(object.type);
-    }
-    if (object.parameters !== undefined && object.parameters !== null) {
-      for (const e of object.parameters) {
-        message.parameters.push(Parameter.fromJSON(e));
-      }
-    }
-    return message;
-  },
-
-  toJSON(message: Encoder): unknown {
-    const obj: any = {};
-    message.type !== undefined && (obj.type = encoderTypeToJSON(message.type));
-    if (message.parameters) {
-      obj.parameters = message.parameters.map((e) =>
-        e ? Parameter.toJSON(e) : undefined
-      );
-    } else {
-      obj.parameters = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Encoder>): Encoder {
-    const message = { ...baseEncoder } as Encoder;
-    message.parameters = [];
-    if (object.type !== undefined && object.type !== null) {
-      message.type = object.type;
-    }
-    if (object.parameters !== undefined && object.parameters !== null) {
-      for (const e of object.parameters) {
-        message.parameters.push(Parameter.fromPartial(e));
-      }
-    }
-    return message;
-  },
-};
-
-const baseServerInfo: object = { platform: 0 };
-
-export const ServerInfo = {
-  encode(message: ServerInfo, writer: Writer = Writer.create()): Writer {
+export const StreamInfo = {
+  encode(message: StreamInfo, writer: Writer = Writer.create()): Writer {
     if (message.platform !== 0) {
       writer.uint32(8).int32(message.platform);
     }
-    for (const v of message.availableSources) {
-      Source.encode(v!, writer.uint32(26).fork()).ldelim();
+    writer.uint32(18).fork();
+    for (const v of message.streamEndpoints) {
+      writer.int32(v);
     }
-    for (const v of message.availableEncoders) {
-      Encoder.encode(v!, writer.uint32(34).fork()).ldelim();
+    writer.ldelim();
+    writer.uint32(26).fork();
+    for (const v of message.streamEncodings) {
+      writer.int32(v);
     }
+    writer.ldelim();
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ServerInfo {
+  decode(input: Reader | Uint8Array, length?: number): StreamInfo {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseServerInfo } as ServerInfo;
-    message.availableSources = [];
-    message.availableEncoders = [];
+    const message = { ...baseStreamInfo } as StreamInfo;
+    message.streamEndpoints = [];
+    message.streamEncodings = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
           message.platform = reader.int32() as any;
           break;
-        case 3:
-          message.availableSources.push(Source.decode(reader, reader.uint32()));
+        case 2:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.streamEndpoints.push(reader.int32() as any);
+            }
+          } else {
+            message.streamEndpoints.push(reader.int32() as any);
+          }
           break;
-        case 4:
-          message.availableEncoders.push(
-            Encoder.decode(reader, reader.uint32())
-          );
+        case 3:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.streamEncodings.push(reader.int32() as any);
+            }
+          } else {
+            message.streamEncodings.push(reader.int32() as any);
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -1105,177 +972,120 @@ export const ServerInfo = {
     return message;
   },
 
-  fromJSON(object: any): ServerInfo {
-    const message = { ...baseServerInfo } as ServerInfo;
-    message.availableSources = [];
-    message.availableEncoders = [];
+  fromJSON(object: any): StreamInfo {
+    const message = { ...baseStreamInfo } as StreamInfo;
+    message.streamEndpoints = [];
+    message.streamEncodings = [];
     if (object.platform !== undefined && object.platform !== null) {
       message.platform = platformFromJSON(object.platform);
     }
     if (
-      object.availableSources !== undefined &&
-      object.availableSources !== null
+      object.streamEndpoints !== undefined &&
+      object.streamEndpoints !== null
     ) {
-      for (const e of object.availableSources) {
-        message.availableSources.push(Source.fromJSON(e));
+      for (const e of object.streamEndpoints) {
+        message.streamEndpoints.push(streamEndpointFromJSON(e));
       }
     }
     if (
-      object.availableEncoders !== undefined &&
-      object.availableEncoders !== null
+      object.streamEncodings !== undefined &&
+      object.streamEncodings !== null
     ) {
-      for (const e of object.availableEncoders) {
-        message.availableEncoders.push(Encoder.fromJSON(e));
+      for (const e of object.streamEncodings) {
+        message.streamEncodings.push(streamEncodingFromJSON(e));
       }
     }
     return message;
   },
 
-  toJSON(message: ServerInfo): unknown {
+  toJSON(message: StreamInfo): unknown {
     const obj: any = {};
     message.platform !== undefined &&
       (obj.platform = platformToJSON(message.platform));
-    if (message.availableSources) {
-      obj.availableSources = message.availableSources.map((e) =>
-        e ? Source.toJSON(e) : undefined
+    if (message.streamEndpoints) {
+      obj.streamEndpoints = message.streamEndpoints.map((e) =>
+        streamEndpointToJSON(e)
       );
     } else {
-      obj.availableSources = [];
+      obj.streamEndpoints = [];
     }
-    if (message.availableEncoders) {
-      obj.availableEncoders = message.availableEncoders.map((e) =>
-        e ? Encoder.toJSON(e) : undefined
+    if (message.streamEncodings) {
+      obj.streamEncodings = message.streamEncodings.map((e) =>
+        streamEncodingToJSON(e)
       );
     } else {
-      obj.availableEncoders = [];
+      obj.streamEncodings = [];
     }
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ServerInfo>): ServerInfo {
-    const message = { ...baseServerInfo } as ServerInfo;
-    message.availableSources = [];
-    message.availableEncoders = [];
+  fromPartial(object: DeepPartial<StreamInfo>): StreamInfo {
+    const message = { ...baseStreamInfo } as StreamInfo;
+    message.streamEndpoints = [];
+    message.streamEncodings = [];
     if (object.platform !== undefined && object.platform !== null) {
       message.platform = object.platform;
     }
     if (
-      object.availableSources !== undefined &&
-      object.availableSources !== null
+      object.streamEndpoints !== undefined &&
+      object.streamEndpoints !== null
     ) {
-      for (const e of object.availableSources) {
-        message.availableSources.push(Source.fromPartial(e));
+      for (const e of object.streamEndpoints) {
+        message.streamEndpoints.push(e);
       }
     }
     if (
-      object.availableEncoders !== undefined &&
-      object.availableEncoders !== null
+      object.streamEncodings !== undefined &&
+      object.streamEncodings !== null
     ) {
-      for (const e of object.availableEncoders) {
-        message.availableEncoders.push(Encoder.fromPartial(e));
+      for (const e of object.streamEncodings) {
+        message.streamEncodings.push(e);
       }
     }
     return message;
   },
 };
 
-const baseStreamsChange: object = {};
-
-export const StreamsChange = {
-  encode(message: StreamsChange, writer: Writer = Writer.create()): Writer {
-    for (const v of message.streams) {
-      StreamsChange_StreamChange.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): StreamsChange {
-    const reader = input instanceof Reader ? input : new Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseStreamsChange } as StreamsChange;
-    message.streams = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 2:
-          message.streams.push(
-            StreamsChange_StreamChange.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StreamsChange {
-    const message = { ...baseStreamsChange } as StreamsChange;
-    message.streams = [];
-    if (object.streams !== undefined && object.streams !== null) {
-      for (const e of object.streams) {
-        message.streams.push(StreamsChange_StreamChange.fromJSON(e));
-      }
-    }
-    return message;
-  },
-
-  toJSON(message: StreamsChange): unknown {
-    const obj: any = {};
-    if (message.streams) {
-      obj.streams = message.streams.map((e) =>
-        e ? StreamsChange_StreamChange.toJSON(e) : undefined
-      );
-    } else {
-      obj.streams = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<StreamsChange>): StreamsChange {
-    const message = { ...baseStreamsChange } as StreamsChange;
-    message.streams = [];
-    if (object.streams !== undefined && object.streams !== null) {
-      for (const e of object.streams) {
-        message.streams.push(StreamsChange_StreamChange.fromPartial(e));
-      }
-    }
-    return message;
-  },
+const baseStreamChange: object = {
+  id: 0,
+  command: 0,
+  streamMedium: 0,
+  streamDirection: 0,
+  streamEndpoint: 0,
+  streamEncoding: 0,
 };
 
-const baseStreamsChange_StreamChange: object = { id: 0 };
-
-export const StreamsChange_StreamChange = {
-  encode(
-    message: StreamsChange_StreamChange,
-    writer: Writer = Writer.create()
-  ): Writer {
+export const StreamChange = {
+  encode(message: StreamChange, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint32(message.id);
     }
-    if (message.source !== undefined) {
-      Source.encode(message.source, writer.uint32(18).fork()).ldelim();
+    if (message.command !== 0) {
+      writer.uint32(16).int32(message.command);
     }
-    if (message.encoder !== undefined) {
-      Encoder.encode(message.encoder, writer.uint32(26).fork()).ldelim();
+    if (message.streamMedium !== 0) {
+      writer.uint32(24).int32(message.streamMedium);
     }
-    if (message.command !== undefined) {
-      writer.uint32(32).int32(message.command);
+    if (message.streamDirection !== 0) {
+      writer.uint32(32).int32(message.streamDirection);
+    }
+    if (message.streamEndpoint !== 0) {
+      writer.uint32(40).int32(message.streamEndpoint);
+    }
+    if (message.streamEncoding !== 0) {
+      writer.uint32(48).int32(message.streamEncoding);
+    }
+    for (const v of message.property) {
+      Property.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): StreamsChange_StreamChange {
+  decode(input: Reader | Uint8Array, length?: number): StreamChange {
     const reader = input instanceof Reader ? input : new Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseStreamsChange_StreamChange,
-    } as StreamsChange_StreamChange;
+    const message = { ...baseStreamChange } as StreamChange;
+    message.property = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1283,13 +1093,22 @@ export const StreamsChange_StreamChange = {
           message.id = reader.uint32();
           break;
         case 2:
-          message.source = Source.decode(reader, reader.uint32());
+          message.command = reader.int32() as any;
           break;
         case 3:
-          message.encoder = Encoder.decode(reader, reader.uint32());
+          message.streamMedium = reader.int32() as any;
           break;
         case 4:
-          message.command = reader.int32() as any;
+          message.streamDirection = reader.int32() as any;
+          break;
+        case 5:
+          message.streamEndpoint = reader.int32() as any;
+          break;
+        case 6:
+          message.streamEncoding = reader.int32() as any;
+          break;
+        case 7:
+          message.property.push(Property.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1299,192 +1118,89 @@ export const StreamsChange_StreamChange = {
     return message;
   },
 
-  fromJSON(object: any): StreamsChange_StreamChange {
-    const message = {
-      ...baseStreamsChange_StreamChange,
-    } as StreamsChange_StreamChange;
+  fromJSON(object: any): StreamChange {
+    const message = { ...baseStreamChange } as StreamChange;
+    message.property = [];
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
-    }
-    if (object.source !== undefined && object.source !== null) {
-      message.source = Source.fromJSON(object.source);
-    }
-    if (object.encoder !== undefined && object.encoder !== null) {
-      message.encoder = Encoder.fromJSON(object.encoder);
     }
     if (object.command !== undefined && object.command !== null) {
       message.command = commandFromJSON(object.command);
     }
-    return message;
-  },
-
-  toJSON(message: StreamsChange_StreamChange): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.source !== undefined &&
-      (obj.source = message.source ? Source.toJSON(message.source) : undefined);
-    message.encoder !== undefined &&
-      (obj.encoder = message.encoder
-        ? Encoder.toJSON(message.encoder)
-        : undefined);
-    message.command !== undefined &&
-      (obj.command =
-        message.command !== undefined
-          ? commandToJSON(message.command)
-          : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<StreamsChange_StreamChange>
-  ): StreamsChange_StreamChange {
-    const message = {
-      ...baseStreamsChange_StreamChange,
-    } as StreamsChange_StreamChange;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (object.streamMedium !== undefined && object.streamMedium !== null) {
+      message.streamMedium = streamMediumFromJSON(object.streamMedium);
     }
-    if (object.source !== undefined && object.source !== null) {
-      message.source = Source.fromPartial(object.source);
+    if (
+      object.streamDirection !== undefined &&
+      object.streamDirection !== null
+    ) {
+      message.streamDirection = streamDirectionFromJSON(object.streamDirection);
     }
-    if (object.encoder !== undefined && object.encoder !== null) {
-      message.encoder = Encoder.fromPartial(object.encoder);
+    if (object.streamEndpoint !== undefined && object.streamEndpoint !== null) {
+      message.streamEndpoint = streamEndpointFromJSON(object.streamEndpoint);
     }
-    if (object.command !== undefined && object.command !== null) {
-      message.command = object.command;
+    if (object.streamEncoding !== undefined && object.streamEncoding !== null) {
+      message.streamEncoding = streamEncodingFromJSON(object.streamEncoding);
     }
-    return message;
-  },
-};
-
-const baseStreamStatistics: object = {
-  lastFrame: 0,
-  averageFrameQp: 0,
-  encodeTsStartMs: 0,
-  encodeTsEndMs: 0,
-  txTsStartMs: 0,
-  txTsEndMs: 0,
-};
-
-export const StreamStatistics = {
-  encode(message: StreamStatistics, writer: Writer = Writer.create()): Writer {
-    if (message.lastFrame !== 0) {
-      writer.uint32(8).uint32(message.lastFrame);
-    }
-    if (message.averageFrameQp !== 0) {
-      writer.uint32(16).uint32(message.averageFrameQp);
-    }
-    if (message.encodeTsStartMs !== 0) {
-      writer.uint32(24).uint32(message.encodeTsStartMs);
-    }
-    if (message.encodeTsEndMs !== 0) {
-      writer.uint32(32).uint32(message.encodeTsEndMs);
-    }
-    if (message.txTsStartMs !== 0) {
-      writer.uint32(40).uint32(message.txTsStartMs);
-    }
-    if (message.txTsEndMs !== 0) {
-      writer.uint32(48).uint32(message.txTsEndMs);
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): StreamStatistics {
-    const reader = input instanceof Reader ? input : new Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseStreamStatistics } as StreamStatistics;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.lastFrame = reader.uint32();
-          break;
-        case 2:
-          message.averageFrameQp = reader.uint32();
-          break;
-        case 3:
-          message.encodeTsStartMs = reader.uint32();
-          break;
-        case 4:
-          message.encodeTsEndMs = reader.uint32();
-          break;
-        case 5:
-          message.txTsStartMs = reader.uint32();
-          break;
-        case 6:
-          message.txTsEndMs = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+    if (object.property !== undefined && object.property !== null) {
+      for (const e of object.property) {
+        message.property.push(Property.fromJSON(e));
       }
     }
     return message;
   },
 
-  fromJSON(object: any): StreamStatistics {
-    const message = { ...baseStreamStatistics } as StreamStatistics;
-    if (object.lastFrame !== undefined && object.lastFrame !== null) {
-      message.lastFrame = Number(object.lastFrame);
-    }
-    if (object.averageFrameQp !== undefined && object.averageFrameQp !== null) {
-      message.averageFrameQp = Number(object.averageFrameQp);
-    }
-    if (
-      object.encodeTsStartMs !== undefined &&
-      object.encodeTsStartMs !== null
-    ) {
-      message.encodeTsStartMs = Number(object.encodeTsStartMs);
-    }
-    if (object.encodeTsEndMs !== undefined && object.encodeTsEndMs !== null) {
-      message.encodeTsEndMs = Number(object.encodeTsEndMs);
-    }
-    if (object.txTsStartMs !== undefined && object.txTsStartMs !== null) {
-      message.txTsStartMs = Number(object.txTsStartMs);
-    }
-    if (object.txTsEndMs !== undefined && object.txTsEndMs !== null) {
-      message.txTsEndMs = Number(object.txTsEndMs);
-    }
-    return message;
-  },
-
-  toJSON(message: StreamStatistics): unknown {
+  toJSON(message: StreamChange): unknown {
     const obj: any = {};
-    message.lastFrame !== undefined && (obj.lastFrame = message.lastFrame);
-    message.averageFrameQp !== undefined &&
-      (obj.averageFrameQp = message.averageFrameQp);
-    message.encodeTsStartMs !== undefined &&
-      (obj.encodeTsStartMs = message.encodeTsStartMs);
-    message.encodeTsEndMs !== undefined &&
-      (obj.encodeTsEndMs = message.encodeTsEndMs);
-    message.txTsStartMs !== undefined &&
-      (obj.txTsStartMs = message.txTsStartMs);
-    message.txTsEndMs !== undefined && (obj.txTsEndMs = message.txTsEndMs);
+    message.id !== undefined && (obj.id = message.id);
+    message.command !== undefined &&
+      (obj.command = commandToJSON(message.command));
+    message.streamMedium !== undefined &&
+      (obj.streamMedium = streamMediumToJSON(message.streamMedium));
+    message.streamDirection !== undefined &&
+      (obj.streamDirection = streamDirectionToJSON(message.streamDirection));
+    message.streamEndpoint !== undefined &&
+      (obj.streamEndpoint = streamEndpointToJSON(message.streamEndpoint));
+    message.streamEncoding !== undefined &&
+      (obj.streamEncoding = streamEncodingToJSON(message.streamEncoding));
+    if (message.property) {
+      obj.property = message.property.map((e) =>
+        e ? Property.toJSON(e) : undefined
+      );
+    } else {
+      obj.property = [];
+    }
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StreamStatistics>): StreamStatistics {
-    const message = { ...baseStreamStatistics } as StreamStatistics;
-    if (object.lastFrame !== undefined && object.lastFrame !== null) {
-      message.lastFrame = object.lastFrame;
+  fromPartial(object: DeepPartial<StreamChange>): StreamChange {
+    const message = { ...baseStreamChange } as StreamChange;
+    message.property = [];
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
     }
-    if (object.averageFrameQp !== undefined && object.averageFrameQp !== null) {
-      message.averageFrameQp = object.averageFrameQp;
+    if (object.command !== undefined && object.command !== null) {
+      message.command = object.command;
+    }
+    if (object.streamMedium !== undefined && object.streamMedium !== null) {
+      message.streamMedium = object.streamMedium;
     }
     if (
-      object.encodeTsStartMs !== undefined &&
-      object.encodeTsStartMs !== null
+      object.streamDirection !== undefined &&
+      object.streamDirection !== null
     ) {
-      message.encodeTsStartMs = object.encodeTsStartMs;
+      message.streamDirection = object.streamDirection;
     }
-    if (object.encodeTsEndMs !== undefined && object.encodeTsEndMs !== null) {
-      message.encodeTsEndMs = object.encodeTsEndMs;
+    if (object.streamEndpoint !== undefined && object.streamEndpoint !== null) {
+      message.streamEndpoint = object.streamEndpoint;
     }
-    if (object.txTsStartMs !== undefined && object.txTsStartMs !== null) {
-      message.txTsStartMs = object.txTsStartMs;
+    if (object.streamEncoding !== undefined && object.streamEncoding !== null) {
+      message.streamEncoding = object.streamEncoding;
     }
-    if (object.txTsEndMs !== undefined && object.txTsEndMs !== null) {
-      message.txTsEndMs = object.txTsEndMs;
+    if (object.property !== undefined && object.property !== null) {
+      for (const e of object.property) {
+        message.property.push(Property.fromPartial(e));
+      }
     }
     return message;
   },
@@ -1566,21 +1282,21 @@ export const Message = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (message.message?.$case === "serverInfo") {
-      ServerInfo.encode(
-        message.message.serverInfo,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
     if (message.message?.$case === "streamChange") {
-      StreamsChange.encode(
+      StreamChange.encode(
         message.message.streamChange,
-        writer.uint32(26).fork()
+        writer.uint32(18).fork()
       ).ldelim();
     }
     if (message.message?.$case === "streamData") {
       StreamData.encode(
         message.message.streamData,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
+    if (message.message?.$case === "streamInfo") {
+      StreamInfo.encode(
+        message.message.streamInfo,
         writer.uint32(34).fork()
       ).ldelim();
     }
@@ -1599,20 +1315,20 @@ export const Message = {
           break;
         case 2:
           message.message = {
-            $case: "serverInfo",
-            serverInfo: ServerInfo.decode(reader, reader.uint32()),
+            $case: "streamChange",
+            streamChange: StreamChange.decode(reader, reader.uint32()),
           };
           break;
         case 3:
           message.message = {
-            $case: "streamChange",
-            streamChange: StreamsChange.decode(reader, reader.uint32()),
+            $case: "streamData",
+            streamData: StreamData.decode(reader, reader.uint32()),
           };
           break;
         case 4:
           message.message = {
-            $case: "streamData",
-            streamData: StreamData.decode(reader, reader.uint32()),
+            $case: "streamInfo",
+            streamInfo: StreamInfo.decode(reader, reader.uint32()),
           };
           break;
         default:
@@ -1628,16 +1344,10 @@ export const Message = {
     if (object.type !== undefined && object.type !== null) {
       message.type = messageTypeFromJSON(object.type);
     }
-    if (object.serverInfo !== undefined && object.serverInfo !== null) {
-      message.message = {
-        $case: "serverInfo",
-        serverInfo: ServerInfo.fromJSON(object.serverInfo),
-      };
-    }
     if (object.streamChange !== undefined && object.streamChange !== null) {
       message.message = {
         $case: "streamChange",
-        streamChange: StreamsChange.fromJSON(object.streamChange),
+        streamChange: StreamChange.fromJSON(object.streamChange),
       };
     }
     if (object.streamData !== undefined && object.streamData !== null) {
@@ -1646,23 +1356,29 @@ export const Message = {
         streamData: StreamData.fromJSON(object.streamData),
       };
     }
+    if (object.streamInfo !== undefined && object.streamInfo !== null) {
+      message.message = {
+        $case: "streamInfo",
+        streamInfo: StreamInfo.fromJSON(object.streamInfo),
+      };
+    }
     return message;
   },
 
   toJSON(message: Message): unknown {
     const obj: any = {};
     message.type !== undefined && (obj.type = messageTypeToJSON(message.type));
-    message.message?.$case === "serverInfo" &&
-      (obj.serverInfo = message.message?.serverInfo
-        ? ServerInfo.toJSON(message.message?.serverInfo)
-        : undefined);
     message.message?.$case === "streamChange" &&
       (obj.streamChange = message.message?.streamChange
-        ? StreamsChange.toJSON(message.message?.streamChange)
+        ? StreamChange.toJSON(message.message?.streamChange)
         : undefined);
     message.message?.$case === "streamData" &&
       (obj.streamData = message.message?.streamData
         ? StreamData.toJSON(message.message?.streamData)
+        : undefined);
+    message.message?.$case === "streamInfo" &&
+      (obj.streamInfo = message.message?.streamInfo
+        ? StreamInfo.toJSON(message.message?.streamInfo)
         : undefined);
     return obj;
   },
@@ -1673,23 +1389,13 @@ export const Message = {
       message.type = object.type;
     }
     if (
-      object.message?.$case === "serverInfo" &&
-      object.message?.serverInfo !== undefined &&
-      object.message?.serverInfo !== null
-    ) {
-      message.message = {
-        $case: "serverInfo",
-        serverInfo: ServerInfo.fromPartial(object.message.serverInfo),
-      };
-    }
-    if (
       object.message?.$case === "streamChange" &&
       object.message?.streamChange !== undefined &&
       object.message?.streamChange !== null
     ) {
       message.message = {
         $case: "streamChange",
-        streamChange: StreamsChange.fromPartial(object.message.streamChange),
+        streamChange: StreamChange.fromPartial(object.message.streamChange),
       };
     }
     if (
@@ -1700,6 +1406,16 @@ export const Message = {
       message.message = {
         $case: "streamData",
         streamData: StreamData.fromPartial(object.message.streamData),
+      };
+    }
+    if (
+      object.message?.$case === "streamInfo" &&
+      object.message?.streamInfo !== undefined &&
+      object.message?.streamInfo !== null
+    ) {
+      message.message = {
+        $case: "streamInfo",
+        streamInfo: StreamInfo.fromPartial(object.message.streamInfo),
       };
     }
     return message;

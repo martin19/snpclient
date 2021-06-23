@@ -1,5 +1,10 @@
 import {SnpComponent} from "./SnpComponent";
 
+export interface PipeState {
+  self : "preinit"|"initialized"|"running",
+  peer : "preinit"|"initialized"|"running",
+}
+
 export interface SnpPipeOptions {
 
 }
@@ -8,8 +13,11 @@ export class SnpPipe {
   private _enabled : boolean;
   components : SnpComponent[];
 
+  state : PipeState;
+
   constructor(options : SnpPipeOptions) {
     this.components = [];
+    this.state = { self : "preinit", peer : "preinit" };
   }
 
   get enabled(): boolean {

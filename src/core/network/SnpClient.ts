@@ -1,25 +1,18 @@
 import {SnpSocket} from "../network/SnpSocket";
 import {
   Command,
-  EncoderType,
-  Message,
-  MessageType,
-  ServerInfo,
-  SourceSubType,
-  SourceType,
-  StreamsChange,
-  StreamData, ParameterType
+  StreamChange,
+  StreamData,
+  StreamDirection,
+  StreamEncoding,
+  StreamEndpoint,
+  StreamInfo,
+  StreamMedium
 } from "../network/proto/snappyv1";
-import SnpStreamElement from "../../ui/SnpStreamElement";
-import {SnpDecoderH264} from "../stream/video/SnpDecoderH264";
-import {SnpSinkYuv} from "../stream/video/SnpSinkYuv";
-import {OnDataCallback, SnpPort} from "../stream/SnpPort";
-import {SnpSourceNetwork} from "../stream/network/SnpSourceNetwork";
+import {OnDataCallback} from "../stream/SnpPort";
 import {SnpPipe} from "../stream/SnpPipe";
-import {SnpSourceMouse} from "../stream/input/SnpSourceMouse";
-import {SnpSinkNetwork} from "../stream/network/SnpSinkNetwork";
-import {SnpSourceKeyboard} from "../stream/input/SnpSourceKeyboard";
-import {SnpSinkCursor} from "../stream/input/SnpSinkCursor";
+import {SnpPipeFactory} from "../stream/SnpPipeFactory";
+import {PropertyUtil} from "../util/PropertyUtil";
 
 export interface SnpClientOptions {
   url : string;
@@ -39,105 +32,24 @@ export interface SnpClientOptions {
 
 export class SnpClient {
 
-  serverInfo : ServerInfo;
-  serverInfoReady : Promise<void>;
+  streamInfo : StreamInfo;
+  streamInfoReady : Promise<void>;
 
   socket : SnpSocket;
-  fixedVideoPipe : SnpPipe;
-  fixedMousePipe : SnpPipe;
-  fixedKeyboardPipe : SnpPipe;
-  fixedCursorPipe : SnpPipe;
+  pipes : Map<number, SnpPipe>;
 
   streamListeners : Map<number, OnDataCallback>;
 
   constructor(options : SnpClientOptions) {
     this.socket = new SnpSocket({
       url : options.url,
-      onServerInfo : this.onServerInfo.bind(this),
-      onStreamsChange : this.onStreamsChange.bind(this),
+      onStreamInfo : this.onStreamInfo.bind(this),
+      onStreamChange : this.onStreamChange.bind(this),
       onStreamData : this.onStreamData.bind(this)
     });
 
     this.streamListeners = new Map();
-
-    //create a fixed video pipe
-    {
-      const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
-      //TODO: move this somewhere else.
-      snpStreamElement.streamWidth = 1920;
-      snpStreamElement.streamHeight = 1080;
-      const source = new SnpSourceNetwork({
-        streamId : 0,
-        client : this
-      });
-      const decoder = new SnpDecoderH264({
-        width : 1920,
-        height : 1080,
-      });
-      const sink = new SnpSinkYuv({
-        width : 1920,
-        height : 1080,
-        snpStreamElement : snpStreamElement
-      });
-      SnpPort.connect(source.getOutputPort(0), decoder.getInputPort(0));
-      SnpPort.connect(decoder.getOutputPort(0), sink.getInputPort(0));
-
-      this.fixedVideoPipe = new SnpPipe({});
-      this.fixedVideoPipe.addComponent(source);
-      this.fixedVideoPipe.addComponent(decoder);
-      this.fixedVideoPipe.addComponent(sink);
-    }
-    //create a fixed input mouse pipe
-    {
-      const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
-      const source = new SnpSourceMouse({
-        snpStreamElement : snpStreamElement
-      });
-      const sink = new SnpSinkNetwork({
-        streamId : 1,
-        client : this,
-      });
-      SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
-      this.fixedMousePipe = new SnpPipe({});
-      this.fixedMousePipe.addComponent(source);
-      this.fixedMousePipe.addComponent(sink);
-    }
-    //create a fixed input keyboard pipe
-    {
-      const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
-      const source = new SnpSourceKeyboard({
-        snpStreamElement : snpStreamElement
-      });
-      const sink = new SnpSinkNetwork({
-        streamId : 2,
-        client : this,
-      });
-      SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
-      this.fixedKeyboardPipe = new SnpPipe({});
-      this.fixedKeyboardPipe.addComponent(source);
-      this.fixedKeyboardPipe.addComponent(sink);
-    }
-    //create a fixed cursor pipe
-    {
-      const snpStreamElement = document.getElementsByTagName("snp-stream").item(0) as SnpStreamElement;
-      const source = new SnpSourceNetwork({
-        client : this,
-        streamId : 3
-      });
-      const sink = new SnpSinkCursor({
-        snpStreamElement : snpStreamElement
-      });
-      SnpPort.connect(source.getOutputPort(0), sink.getInputPort(0));
-      this.fixedCursorPipe = new SnpPipe({});
-      this.fixedCursorPipe.addComponent(source);
-      this.fixedCursorPipe.addComponent(sink);
-    }
-
-    //start all pipes
-    this.fixedMousePipe.start();
-    this.fixedKeyboardPipe.start();
-    this.fixedVideoPipe.start();
-    this.fixedCursorPipe.start();
+    this.pipes = new Map();
   }
 
   connect() {
@@ -148,62 +60,136 @@ export class SnpClient {
     this.socket.disconnect();
   }
 
-  private onServerInfo(/*msg:ServerInfo*/) {
-    /*this.serverInfo = msg;*/
+  private onStreamInfo(/*msg:ServerInfo*/) {
+    //TODO: Negotiation
 
-    //TODO: Negotiation: determine which stream should be requested.
-    //* server has a list of supported codecs and available sources to choose from
-    //* client has a list of supported codecs
-    //* user (or default) can choose from available sources
+    //Video stream
+    {
+      let streamChange: StreamChange = {
+        id: 0,
+        command: Command.COMMAND_INIT,
+        streamMedium: StreamMedium.STREAM_MEDIUM_VIDEO,
+        streamEndpoint: StreamEndpoint.STREAM_ENDPOINT_X11,
+        streamDirection: StreamDirection.STREAM_DIRECTION_OUTPUT,
+        streamEncoding: StreamEncoding.STREAM_ENCODING_H264_HARDWARE,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChange);
+    }
 
-    //send a streams change request
-    let streamsChange:StreamsChange = {
-      streams : [
-        {
-          id : 0,
-          command : Command.COMMAND_INIT,
-          source : {
-            type : SourceType.SOURCE_TYPE_VIDEO,
-            subType : SourceSubType.SOURCE_SUB_TYPE_X11,
-            parameters : [
-              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "width", value : { $case:"valueUint32", valueUint32 : { value : 1920 } }},
-              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "height", value: { $case:"valueUint32", valueUint32 : { value : 1080 } }},
-            ]
-          },
-          encoder : {
-            type : EncoderType.ENCODER_TYPE_H264_HARDWARE,
-            parameters : [
-              { type : ParameterType.PARAMETER_TYPE_UINT32, key : "qp", value: { $case:"valueUint32", valueUint32 : { value : 10 } }},
-              { type : ParameterType.PARAMETER_TYPE_DOUBLE, key : "unknownDouble", value: { $case:"valueDouble", valueDouble : { value : 1.0 } }},
-              { type : ParameterType.PARAMETER_TYPE_BOOL, key : "unknownBool", value: { $case:"valueBool", valueBool : { value : true }}},
-              { type : ParameterType.PARAMETER_TYPE_STRING, key : "unknownString", value: { $case:"valueString", valueString : { value : "foo" }}},
-            ]
-          }
-        },
-        {
-          id : 1,
-          command : Command.COMMAND_INIT,
-          source : {
-            type : SourceType.SOURCE_TYPE_AUDIO,
-            subType: SourceSubType.SOURCE_SUB_TYPE_X11,
-            parameters: []
-          },
-          encoder : {
-            type : EncoderType.ENCODER_TYPE_MP3_HARDWARE,
-            parameters: []
-          }
-        }
-      ]
-    };
-    this.socket.sendStreamsChange(streamsChange);
+    //Mouse stream
+    {
+      let streamChange: StreamChange = {
+        id: 1,
+        command: Command.COMMAND_INIT,
+        streamMedium: StreamMedium.STREAM_MEDIUM_PERIPHERIAL,
+        streamEndpoint: StreamEndpoint.STREAM_ENDPOINT_POINTER,
+        streamDirection: StreamDirection.STREAM_DIRECTION_INPUT,
+        streamEncoding: StreamEncoding.UNRECOGNIZED,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChange);
+    }
+
+    //Mouse stream
+    {
+      let streamChange: StreamChange = {
+        id: 2,
+        command: Command.COMMAND_INIT,
+        streamMedium: StreamMedium.STREAM_MEDIUM_PERIPHERIAL,
+        streamEndpoint: StreamEndpoint.STREAM_ENDPOINT_KEYBOARD,
+        streamDirection: StreamDirection.STREAM_DIRECTION_INPUT,
+        streamEncoding: StreamEncoding.UNRECOGNIZED,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChange);
+    }
+
+    //Cursor stream
+    {
+      let streamChange: StreamChange = {
+        id: 3,
+        command: Command.COMMAND_INIT,
+        streamMedium: StreamMedium.STREAM_MEDIUM_PERIPHERIAL,
+        streamEndpoint: StreamEndpoint.STREAM_ENDPOINT_CURSOR,
+        streamDirection: StreamDirection.STREAM_DIRECTION_OUTPUT,
+        streamEncoding: StreamEncoding.UNRECOGNIZED,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChange);
+    }
+
   }
 
-  private onStreamsChange(msg:StreamsChange) {
-    //TODO: initialize an appropriate stream
-    //if a stream with this id exists, rebuild it
-    //if no stream with this id exists, create it
-    // streamChange.id
+  private onStreamChange(msg:StreamChange) {
+    console.log("onStreamChange");
+    console.log(msg);
+
+    switch(msg.command) {
+      case Command.COMMAND_INIT: this.onStreamChangeInit(msg); break;
+      case Command.COMMAND_INIT_OK: this.onStreamChangeInitOk(msg); break;
+      case Command.COMMAND_START: this.onStreamChangeStart(msg); break;
+      case Command.COMMAND_STOP: this.onStreamChangeStop(msg); break;
+      case Command.COMMAND_DESTROY: this.onStreamChangeDestroy(msg); break;
+    }
   }
+
+  onStreamChangeInit(msg:StreamChange) {
+    throw "not implemented";
+  }
+
+  onStreamChangeInitOk(msg:StreamChange) {
+    let streamId = msg.id;
+
+    const selfDirection = msg.streamDirection === StreamDirection.STREAM_DIRECTION_INPUT ?
+      StreamDirection.STREAM_DIRECTION_OUTPUT : StreamDirection.STREAM_DIRECTION_INPUT;
+
+    const pipe = SnpPipeFactory.createPipe(streamId, this, msg.streamMedium, selfDirection, msg.streamEndpoint,
+      msg.streamEncoding, PropertyUtil.protocolPropertyArrayToSnpPropertyMap(msg.property));
+    if(pipe) {
+      this.pipes.set(streamId, pipe);
+      pipe.state.peer = "initialized";
+      pipe.state.self = "initialized";
+
+      //notify peer stream is initialized.
+      let streamChangeInitOk: StreamChange = {
+        id: streamId,
+        command: Command.COMMAND_INIT_OK,
+        streamMedium: msg.streamMedium,
+        streamEndpoint: msg.streamEndpoint,
+        streamDirection: selfDirection,
+        streamEncoding: msg.streamEncoding,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChangeInitOk);
+
+      //immediately start stream
+      //TODO: start self side of stream.
+      let streamChangeStart: StreamChange = {
+        id: streamId,
+        command: Command.COMMAND_START,
+        streamMedium: msg.streamMedium,
+        streamEndpoint: msg.streamEndpoint,
+        streamDirection: selfDirection,
+        streamEncoding: msg.streamEncoding,
+        property : []
+      }
+      this.socket.sendStreamChange(streamChangeStart);
+    }
+  }
+
+  onStreamChangeStart(msg:StreamChange) {
+    throw "not implemented";
+  }
+
+  onStreamChangeStop(msg:StreamChange) {
+    throw "not implemented";
+  }
+
+  onStreamChangeDestroy(msg:StreamChange) {
+    throw "not implemented";
+  }
+
 
   public setStreamListener(streamId : number, cb : OnDataCallback) {
     this.streamListeners.set(streamId, cb);

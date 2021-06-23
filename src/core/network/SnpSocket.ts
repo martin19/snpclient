@@ -1,4 +1,4 @@
-import {Message, MessageType, ServerInfo, StreamData, StreamsChange, StreamStatistics} from "./proto/snappyv1";
+import {Message, MessageType, StreamChange, StreamData, StreamInfo} from "./proto/snappyv1";
 import {SnpSource} from "../stream/video/SnpSource";
 import {SnpDecoderH264} from "../stream/video/SnpDecoderH264";
 import {SnpSinkYuv} from "../stream/video/SnpSinkYuv";
@@ -7,22 +7,22 @@ import SnpStreamElement from "../../ui/SnpStreamElement";
 
 export interface SnpClientOptions {
   url : string
-  onServerInfo : (msg:ServerInfo) => void;
-  onStreamsChange : (msg:StreamsChange) => void;
+  onStreamInfo : (msg:StreamInfo) => void;
+  onStreamChange : (msg:StreamChange) => void;
   onStreamData : (msg:StreamData) => void;
 }
 
 export class SnpSocket {
   url : string;
   socket : WebSocket;
-  onServerInfo : (msg:ServerInfo) => void;
-  onStreamChange : (msg:StreamsChange) => void;
+  onStreamInfo : (msg:StreamInfo) => void;
+  onStreamChange : (msg:StreamChange) => void;
   onStreamData : (msg:StreamData) => void;
 
   constructor(options:SnpClientOptions) {
     this.url = options.url;
-    this.onServerInfo = options.onServerInfo;
-    this.onStreamChange = options.onStreamsChange;
+    this.onStreamInfo = options.onStreamInfo;
+    this.onStreamChange = options.onStreamChange;
     this.onStreamData = options.onStreamData;
   }
 
@@ -40,8 +40,8 @@ export class SnpSocket {
     if(e.data instanceof ArrayBuffer) {
       const message = Message.decode(new Uint8Array(e.data));
       switch(message.message.$case) {
-        case "serverInfo":
-          this.onServerInfo(message.message.serverInfo);
+        case "streamInfo":
+          this.onStreamInfo(message.message.streamInfo);
           break;
         case "streamChange":
           this.onStreamChange(message.message.streamChange);
@@ -56,16 +56,16 @@ export class SnpSocket {
     }
   }
 
-  private onStreamStatistics(streamStatistics: StreamStatistics) {
-    //dump statistics for now
-    console.log(JSON.stringify(streamStatistics, null, " "));
-  }
+  // private onStreamStatistics(streamStatistics: StreamStatistics) {
+  //   //dump statistics for now
+  //   console.log(JSON.stringify(streamStatistics, null, " "));
+  // }
 
-  sendStreamsChange(streamsChange:StreamsChange) {
+  sendStreamChange(streamChange:StreamChange) {
     let msg:Message = {
-      type : MessageType.MESSAGE_TYPE_STREAMS_CHANGE,
+      type : MessageType.MESSAGE_TYPE_STREAM_CHANGE,
       message : {
-        $case : "streamChange", streamChange : streamsChange
+        $case : "streamChange", streamChange : streamChange
       }
     } as Message;
     this.socket.send(Message.encode(msg).finish());
