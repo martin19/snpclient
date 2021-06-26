@@ -93,33 +93,37 @@ export function streamMediumToJSON(object: StreamMedium): string {
 }
 
 export enum StreamEndpoint {
-  STREAM_ENDPOINT_X11 = 0,
-  STREAM_ENDPOINT_WAYLAND = 1,
-  STREAM_ENDPOINT_CAMERA = 2,
-  STREAM_ENDPOINT_KEYBOARD = 3,
-  STREAM_ENDPOINT_POINTER = 4,
-  STREAM_ENDPOINT_CURSOR = 5,
+  STREAM_ENDPOINT_DRM = 0,
+  STREAM_ENDPOINT_X11 = 1,
+  STREAM_ENDPOINT_WAYLAND = 2,
+  STREAM_ENDPOINT_CAMERA = 3,
+  STREAM_ENDPOINT_KEYBOARD = 4,
+  STREAM_ENDPOINT_POINTER = 5,
+  STREAM_ENDPOINT_CURSOR = 6,
   UNRECOGNIZED = -1,
 }
 
 export function streamEndpointFromJSON(object: any): StreamEndpoint {
   switch (object) {
     case 0:
+    case "STREAM_ENDPOINT_DRM":
+      return StreamEndpoint.STREAM_ENDPOINT_DRM;
+    case 1:
     case "STREAM_ENDPOINT_X11":
       return StreamEndpoint.STREAM_ENDPOINT_X11;
-    case 1:
+    case 2:
     case "STREAM_ENDPOINT_WAYLAND":
       return StreamEndpoint.STREAM_ENDPOINT_WAYLAND;
-    case 2:
+    case 3:
     case "STREAM_ENDPOINT_CAMERA":
       return StreamEndpoint.STREAM_ENDPOINT_CAMERA;
-    case 3:
+    case 4:
     case "STREAM_ENDPOINT_KEYBOARD":
       return StreamEndpoint.STREAM_ENDPOINT_KEYBOARD;
-    case 4:
+    case 5:
     case "STREAM_ENDPOINT_POINTER":
       return StreamEndpoint.STREAM_ENDPOINT_POINTER;
-    case 5:
+    case 6:
     case "STREAM_ENDPOINT_CURSOR":
       return StreamEndpoint.STREAM_ENDPOINT_CURSOR;
     case -1:
@@ -131,6 +135,8 @@ export function streamEndpointFromJSON(object: any): StreamEndpoint {
 
 export function streamEndpointToJSON(object: StreamEndpoint): string {
   switch (object) {
+    case StreamEndpoint.STREAM_ENDPOINT_DRM:
+      return "STREAM_ENDPOINT_DRM";
     case StreamEndpoint.STREAM_ENDPOINT_X11:
       return "STREAM_ENDPOINT_X11";
     case StreamEndpoint.STREAM_ENDPOINT_WAYLAND:
@@ -231,7 +237,6 @@ export enum Command {
   COMMAND_STOP = 3,
   COMMAND_SET_PARAMETER = 4,
   COMMAND_DESTROY = 5,
-  COMMAND_ACK = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -255,9 +260,6 @@ export function commandFromJSON(object: any): Command {
     case 5:
     case "COMMAND_DESTROY":
       return Command.COMMAND_DESTROY;
-    case 6:
-    case "COMMAND_ACK":
-      return Command.COMMAND_ACK;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -279,8 +281,6 @@ export function commandToJSON(object: Command): string {
       return "COMMAND_SET_PARAMETER";
     case Command.COMMAND_DESTROY:
       return "COMMAND_DESTROY";
-    case Command.COMMAND_ACK:
-      return "COMMAND_ACK";
     default:
       return "UNKNOWN";
   }

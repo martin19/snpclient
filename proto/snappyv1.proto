@@ -19,12 +19,13 @@ enum StreamMedium {
 }
 
 enum StreamEndpoint {
-    STREAM_ENDPOINT_X11 = 0;
-    STREAM_ENDPOINT_WAYLAND = 1;
-    STREAM_ENDPOINT_CAMERA = 2;
-    STREAM_ENDPOINT_KEYBOARD = 3;
-    STREAM_ENDPOINT_POINTER = 4;
-    STREAM_ENDPOINT_CURSOR = 5;
+    STREAM_ENDPOINT_DRM = 0;
+    STREAM_ENDPOINT_X11 = 1;
+    STREAM_ENDPOINT_WAYLAND = 2;
+    STREAM_ENDPOINT_CAMERA = 3;
+    STREAM_ENDPOINT_KEYBOARD = 4;
+    STREAM_ENDPOINT_POINTER = 5;
+    STREAM_ENDPOINT_CURSOR = 6;
 }
 
 enum StreamDirection {
@@ -46,7 +47,6 @@ enum Command {
     COMMAND_STOP = 3;
     COMMAND_SET_PARAMETER = 4;
     COMMAND_DESTROY = 5;
-    COMMAND_ACK = 6;
 }
 
 enum PropertyType {
@@ -116,7 +116,7 @@ message StreamChange {
 message StreamData {
     uint32 stream_id = 1;
     bytes payload = 2;
-//    optional FrameTiming frame_timing = 3;
+    //    optional FrameTiming frame_timing = 3;
 }
 
 enum MessageType {

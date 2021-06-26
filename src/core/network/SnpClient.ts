@@ -71,7 +71,7 @@ export class SnpClient {
         streamMedium: StreamMedium.STREAM_MEDIUM_VIDEO,
         streamEndpoint: StreamEndpoint.STREAM_ENDPOINT_X11,
         streamDirection: StreamDirection.STREAM_DIRECTION_OUTPUT,
-        streamEncoding: StreamEncoding.STREAM_ENCODING_H264_HARDWARE,
+        streamEncoding: StreamEncoding.STREAM_ENCODING_H264_SOFTWARE,
         property : []
       }
       this.socket.sendStreamChange(streamChange);
